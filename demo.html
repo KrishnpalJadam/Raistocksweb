@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reliable Insights. Smarter Investments.</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <style>
+        /* Custom Styles to replicate the design */
+        :root {
+            --bs-primary: #0d6efd;
+            --bs-danger: #dc3545;
+            --bs-light-gray: #f8f9fa;
+            --bs-dark-blue: #212529; /* Used in the footer */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #fff;
+        }
+
+        /* --- Navbar Styling --- */
+        .navbar-custom {
+            background: linear-gradient(90deg, rgba(13, 110, 253, 0.95) 0%, rgba(0, 123, 255, 0.85) 100%);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link,
+        .navbar-custom .dropdown-toggle {
+            color: #fff !important;
+            font-weight: 500;
+        }
+
+        .navbar-custom .btn-login {
+            border: 1px solid #fff;
+            color: #fff !important;
+            border-radius: 50rem;
+            padding: 0.375rem 1rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .navbar-custom .btn-login:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Hero Section Styling --- */
+        .hero-section {
+            background: linear-gradient(135deg, #0d6efd 0%, #007bff 100%);
+            color: #fff;
+            padding: 10rem 0 6rem 0;
+            position: relative;
+            overflow: hidden; /* Contains the background graphic */
+        }
+
+        /* Abstract bar chart graphic (Simplified using pseudo-elements and background-image) */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23ffffff33' d='M0 100 L10 90 L10 100 Z M15 100 L25 80 L25 100 Z M30 100 L40 60 L40 100 Z M45 100 L55 70 L55 100 Z M60 100 L70 95 L70 100 Z M75 100 L85 50 L85 100 Z M90 100 L100 85 L100 100 Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: 15% 100%;
+            opacity: 0.6;
+            animation: moveBars 30s linear infinite;
+        }
+
+        @keyframes moveBars {
+            from {
+                background-position: 0% 0;
+            }
+            to {
+                background-position: 100% 0;
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2; /* Keep content above the graphic */
+        }
+
+        .btn-lg-custom {
+            padding: 0.75rem 2rem;
+            font-size: 1.25rem;
+            border-radius: 50rem;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn-lg-custom:hover {
+            transform: translateY(-2px);
+        }
+
+        .badge-custom {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-weight: 400;
+            border-radius: 50rem;
+            padding: 0.35em 0.85em;
+            margin: 0 0.5rem;
+        }
+
+        /* --- Features Section Styling --- */
+        .feature-card {
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            min-height: 200px;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon-wrapper {
+            background-color: var(--bs-primary);
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* --- Never Expect Section Styling --- */
+        .never-expect-section {
+            background-color: var(--bs-light-gray);
+            padding: 4rem 0;
+        }
+
+        .never-expect-card {
+            background-color: #fff;
+            border: 2px solid var(--bs-danger);
+            border-radius: 1rem;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .never-expect-card:hover {
+            background-color: rgba(220, 53, 69, 0.05);
+        }
+
+        .never-expect-icon {
+            color: var(--bs-danger);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- Illustrations/Past Performance Section --- */
+        .illustration-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.75rem;
+            transition: box-shadow 0.3s;
+        }
+
+        .illustration-card:hover {
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.2);
+        }
+
+        /* --- Trial Section CTA --- */
+        .trial-cta-section {
+            background: linear-gradient(45deg, #0d6efd 0%, #007bff 100%);
+            color: #fff;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Background bar chart for CTA - subtle */
+        .trial-cta-section::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23ffffff1a' d='M0 100 L10 80 L10 100 Z M15 100 L25 70 L25 100 Z M30 100 L40 90 L40 100 Z M45 100 L55 60 L55 100 Z M60 100 L70 85 L70 100 Z M75 100 L85 95 L85 100 Z M90 100 L100 75 L100 100 Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: 15% 100%;
+            background-repeat: repeat-x;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        .trial-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .trial-checklist li {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .trial-checklist .bi {
+            color: #8cff8c; /* Light green checkmark */
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .btn-trial-cta {
+            background-color: #fff;
+            color: var(--bs-primary) !important;
+            font-weight: 700;
+            border-radius: 50rem;
+            padding: 0.75rem 2.5rem;
+            font-size: 1.25rem;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-trial-cta:hover {
+            background-color: #eee;
+            transform: scale(1.05);
+        }
+
+        /* --- Footer Styling --- */
+        .footer-custom {
+            background-color: var(--bs-dark-blue);
+            color: #ccc;
+            padding: 3rem 0;
+            font-size: 0.9rem;
+        }
+
+        .footer-custom a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-custom a:hover {
+            color: var(--bs-primary);
+        }
+
+        .footer-logo-text {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #fff;
+        }
+
+        .social-icon {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        /* --- Helper Classes --- */
+        .text-sebi {
+            font-size: 0.9rem;
+            font-weight: 300;
+            opacity: 0.8;
+            margin-top: -1rem;
+        }
+
+        .performance-badge-success {
+            background-color: #198754;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.75rem;
+        }
+
+        .performance-badge-danger {
+            background-color: var(--bs-danger);
+            color: #fff;
+            font-weight: 700;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.75rem;
+        }
+
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #0d6efd;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-custom shadow-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <span class="bi bi-graph-up-arrow me-2"></span>**RAI**Stocks
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Services
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="servicesDropdown">
+                            <li><a class="dropdown-item" href="#">Equity Research</a></li>
+                            <li><a class="dropdown-item" href="#">Commodity Tips</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Premium Packages</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="calculatorsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Calculators
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="calculatorsDropdown">
+                            <li><a class="dropdown-item" href="#">SIP Calculator</a></li>
+                            <li><a class="dropdown-item" href="#">Target/Stoploss</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                </ul>
+                <a href="#" class="btn btn-login ms-lg-3">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section text-center">
+        <div class="container hero-content">
+            <p class="mb-1 text-sebi">SEBI Registered Research Analyst</p>
+            <p class="text-sebi">Reg. No.: INH200000XXX (Mock Registration)</p>
+            <h1 class="display-3 fw-bold my-4">Reliable Insights. Smarter Investments. Better Trading...</h1>
+            <p class="lead mb-5">
+                Get Conflict-Free, Audit-Ready, Client-First Research to grow your wealth responsibly.
+            </p>
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-4">
+                <button type="button" class="btn btn-warning btn-lg-custom">Subscribe Now</button>
+                <button type="button" class="btn btn-outline-light btn-lg-custom">View Services</button>
+            </div>
+            <div class="mt-4">
+                <span class="badge-custom"><i class="bi bi-briefcase-fill me-1"></i> Professional</span>
+                <span class="badge-custom"><i class="bi bi-patch-check-fill me-1"></i> Reliable</span>
+                <span class="badge-custom"><i class="bi bi-people-fill me-1"></i> Experienced</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-white">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Conflict-Free. Audit-Ready. Client-First.</h2>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <div class="col">
+                    <div class="card feature-card p-4">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-clipboard-check-fill"></i>
+                        </div>
+                        <h5 class="fw-bold">SEBI-Registered & Fully Compliant</h5>
+                        <p class="text-muted mb-0">Operate strictly under SEBI RA guidelines, ensuring investor protection and legal compliance at all times.</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card feature-card p-4">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-lightbulb-fill"></i>
+                        </div>
+                        <h5 class="fw-bold">Research You Can Rely On</h5>
+                        <p class="text-muted mb-0">In-depth fundamental and technical analysis, free from the conflict of interest of brokerages.</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card feature-card p-4">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-eye-fill"></i>
+                        </div>
+                        <h5 class="fw-bold">Transparent Tracking 24x7</h5>
+                        <p class="text-muted mb-0">All past calls, performance, and disclosures are available for public audit and verification anytime.</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card feature-card p-4">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-shield-lock-fill"></i>
+                        </div>
+                        <h5 class="fw-bold">Data Privacy & Zero Conflict</h5>
+                        <p class="text-muted mb-0">Your privacy is paramount. We don't trade our research recommendations ahead of clients.</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card feature-card p-4">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        <h5 class="fw-bold">Client-First Refund Assurance</h5>
+                        <p class="text-muted mb-0">Clear and fair refund policy defined in our terms, prioritizing client satisfaction and trust.</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card feature-card p-4">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-headset"></i>
+                        </div>
+                        <h5 class="fw-bold">Dedicated Support & SEBI Scores</h5>
+                        <p class="text-muted mb-0">Direct access to support and strict adherence to timelines for complaint resolution and SEBI SCORES.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
+    <section class="never-expect-section">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">WHAT YOU SHOULD NEVER EXPECT FROM US</h2>
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
+                <div class="col">
+                    <div class="never-expect-card p-3 shadow-sm">
+                        <div>
+                            <div class="never-expect-icon"><i class="bi bi-x-octagon-fill"></i></div>
+                            <p class="fw-bold small mb-0">No Fake Guarantees</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="never-expect-card p-3 shadow-sm">
+                        <div>
+                            <div class="never-expect-icon"><i class="bi bi-currency-exchange"></i></div>
+                            <p class="fw-bold small mb-0">No Trading on Your Behalf</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="never-expect-card p-3 shadow-sm">
+                        <div>
+                            <div class="never-expect-icon"><i class="bi bi-person-x-fill"></i></div>
+                            <p class="fw-bold small mb-0">No Profit Sharing</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="never-expect-card p-3 shadow-sm">
+                        <div>
+                            <div class="never-expect-icon"><i class="bi bi-file-earmark-lock-fill"></i></div>
+                            <p class="fw-bold small mb-0">No Insider Info/Tips</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="never-expect-card p-3 shadow-sm">
+                        <div>
+                            <div class="never-expect-icon"><i class="bi bi-megaphone-fill"></i></div>
+                            <p class="fw-bold small mb-0">No Spam Calls/SMS</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="never-expect-card p-3 shadow-sm">
+                        <div>
+                            <div class="never-expect-icon"><i class="bi bi-telephone-x-fill"></i></div>
+                            <p class="fw-bold small mb-0">No Doorstep Collection</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
+    <section class="py-5 bg-white">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Check Out Our Illustrations</h2>
+            <p class="text-center text-muted mb-4">Experience Shared by Those We've Helped (Illustrative Examples)</p>
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
+                <div class="col">
+                    <div class="illustration-card p-3 text-center">
+                        <div class="mb-2">
+                            <span class="performance-badge-success">Hit Target 1</span>
+                        </div>
+                        <h6 class="fw-bold">Reliance Ind.</h6>
+                        <p class="small mb-0 text-success fw-bold">+18.5% PROFIT</p>
+                        <p class="small text-muted mb-0">Entry: 2400 | Exit: 2844</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="illustration-card p-3 text-center">
+                        <div class="mb-2">
+                            <span class="performance-badge-success">Multi-bagger</span>
+                        </div>
+                        <h6 class="fw-bold">TCS Ltd.</h6>
+                        <p class="small mb-0 text-success fw-bold">+45.2% PROFIT</p>
+                        <p class="small text-muted mb-0">Entry: 3200 | Exit: 4646</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="illustration-card p-3 text-center">
+                        <div class="mb-2">
+                            <span class="performance-badge-danger">Stoploss Hit</span>
+                        </div>
+                        <h6 class="fw-bold">HDFC Bank</h6>
+                        <p class="small mb-0 text-danger fw-bold">-5.1% LOSS</p>
+                        <p class="small text-muted mb-0">Entry: 1550 | Exit: 1471</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="illustration-card p-3 text-center">
+                        <div class="mb-2">
+                            <span class="performance-badge-success">Target 2 Hit</span>
+                        </div>
+                        <h6 class="fw-bold">Infosys</h6>
+                        <p class="small mb-0 text-success fw-bold">+22.0% PROFIT</p>
+                        <p class="small text-muted mb-0">Entry: 1400 | Exit: 1708</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="illustration-card p-3 text-center">
+                        <div class="mb-2">
+                            <span class="performance-badge-success">Short Term</span>
+                        </div>
+                        <h6 class="fw-bold">Maruti</h6>
+                        <p class="small mb-0 text-success fw-bold">+12.8% PROFIT</p>
+                        <p class="small text-muted mb-0">Entry: 9500 | Exit: 10716</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="illustration-card p-3 text-center">
+                        <div class="mb-2">
+                            <span class="performance-badge-success">Target 1 Hit</span>
+                        </div>
+                        <h6 class="fw-bold">Wipro</h6>
+                        <p class="small mb-0 text-success fw-bold">+9.9% PROFIT</p>
+                        <p class="small text-muted mb-0">Entry: 400 | Exit: 439</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                 <p class="small text-muted fst-italic">*Disclaimer: Past performance is not indicative of future returns. Illustrations are for example only.</p>
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
+    <section class="py-5 bg-light-gray">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-4">Number of Client's Complaints</h2>
+            <div class="table-responsive shadow-sm">
+                <table class="table table-bordered table-striped text-center align-middle caption-top bg-white">
+                    <caption>Complaint Data for FY 2024-25 (Illustrative)</caption>
+                    <thead class="table-primary">
+                        <tr>
+                            <th scope="col">Received From</th>
+                            <th scope="col">Pending</th>
+                            <th scope="col">Received</th>
+                            <th scope="col">Resolved</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Pending > 3 months</th>
+                            <th scope="col">Avg Resolution (Days)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Direct Clients</td>
+                            <td>0</td>
+                            <td>2</td>
+                            <td>2</td>
+                            <td>2</td>
+                            <td>0</td>
+                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <td>SEBI (SCORES)</td>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>0</td>
+                            <td>8</td>
+                        </tr>
+                        <tr class="table-secondary fw-bold">
+                            <td>TOTAL</td>
+                            <td>0</td>
+                            <td>3</td>
+                            <td>3</td>
+                            <td>3</td>
+                            <td>0</td>
+                            <td>6</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+             <p class="small text-muted text-center mt-3">All data strictly reported as per SEBI Guidelines and disclosed quarterly.</p>
+        </div>
+    </section>
+
+    <hr>
+
+    <section class="py-5 bg-white">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Experience Shared By Those We've Helped</h2>
+            <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="card p-4 shadow-lg border-0 text-center mx-auto" style="max-width: 600px;">
+                            <p class="lead fst-italic">"The analysis is deep and their process is completely transparent. It's refreshing to see a SEBI-RA who truly puts the client first. My returns have been consistent and manageable."</p>
+                            <div class="mt-3">
+                                <p class="fw-bold mb-1">- Rajesh K.</p>
+                                <div class="text-warning">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="card p-4 shadow-lg border-0 text-center mx-auto" style="max-width: 600px;">
+                            <p class="lead fst-italic">"No hidden costs and the 15-day trial was a game-changer. I saw the value before committing. Great support on portfolio restructuring."</p>
+                            <div class="mt-3">
+                                <p class="fw-bold mb-1">- Priya S.</p>
+                                <div class="text-warning">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
+    <section class="trial-cta-section">
+        <div class="container trial-content">
+            <h2 class="display-5 fw-bold mb-3">15-Day Trial @ ₹999 – Proof Over Promises</h2>
+            <p class="lead mb-4">Experience the confidence of conflict-free research.</p>
+
+            <div class="row justify-content-center mb-4">
+                <div class="col-md-8 col-lg-6">
+                    <ul class="trial-checklist list-unstyled text-center mx-auto">
+                        <li><i class="bi bi-check-circle-fill"></i> Full 15 Calendar Days / 11 Trading Days</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Min. 1 High-Quality Alert Daily</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Complete Portfolio Access & Guidance</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Full Transparency. No Hidden Charges.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <a href="#" class="btn btn-trial-cta shadow-lg">Start Trial Now</a>
+        </div>
+    </section>
+
+    <footer class="footer-custom">
+        <div class="container">
+            <div class="row pt-4 pb-3">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <a href="#" class="footer-logo-text d-block mb-3">
+                        <span class="bi bi-graph-up-arrow me-2"></span>**RAI**Stocks
+                    </a>
+                    <p class="small">SEBI Registered Research Analyst. Reg. No.: INH200000XXX</p>
+                    <p class="small">We provide audit-ready, conflict-free research to help you make smarter, more reliable investments.</p>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="text-white fw-bold mb-3">Contact Info</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-geo-alt-fill me-2"></i> Mumbai, Maharashtra, India.</li>
+                        <li class="mb-2"><i class="bi bi-telephone-fill me-2"></i> +91-98765 43210</li>
+                        <li class="mb-2"><i class="bi bi-envelope-fill me-2"></i> support@raistocks.in</li>
+                    </ul>
+                    <div class="mt-3">
+                        <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="text-white fw-bold mb-3">Our Services</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Equity Research</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-1"></i> F&O Strategies</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Long Term Portfolios</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Commodity Research</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Free Trial</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="text-white fw-bold mb-3">Important Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Terms & Conditions</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Privacy Policy</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Refund Policy</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-1"></i> SEBI Investor Charter</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-1"></i> Disclosure & Disclaimers</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 text-center pt-3 border-top border-secondary">
+                    <p class="mb-0 small">&copy; <script>document.write(new Date().getFullYear())</script> RAIStocks. All Rights Reserved. Investment in the securities market is subject to market risks.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

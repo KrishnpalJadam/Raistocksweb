@@ -1,46 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { X } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { loginCRMUser } from "../slices/crmAuthSlice"; // adjust path
 
 const Login = ({ show, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+const navigate = useNavigate();
+  if (!show) return null;
 
-  const { user, loading, error } = useSelector((state) => state.crmAuth);
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  // 🔁 If already logged in, auto redirect to dashboard
-  useEffect(() => {
-    if (user) {
+    if (email === "user@example.com" && password === "123") {
       toast.success("Login successful 🎉");
       setTimeout(() => {
         onClose();
-        navigate("/customer/dashboard");
+       navigate("customer/dashboard")
       }, 1500);
-    }
-  }, [user, navigate, onClose]);
-
-  // ❌ Don't show if modal is closed
-  if (!show) return null;
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!email || !password) {
-      toast.error("Please fill in both fields");
-      return;
-    }
-
-    try {
-      await dispatch(loginCRMUser({ email, password })).unwrap();
-    } catch (err) {
-      toast.error(err || "Invalid credentials");
+    } else {
+      toast.error("Invalid credentials");
     }
   };
 
@@ -92,16 +72,10 @@ const Login = ({ show, onClose }) => {
               />
             </div>
 
-            <button
-              type="submit"
-              className="btn btn-primary w-100"
-              disabled={loading}
-            >
-              {loading ? "Logging in..." : "Login"}
+            <button type="submit" className="btn btn-primary w-100">
+              Login
             </button>
           </form>
-
-          {error && <p className="text-danger small mt-2">{error}</p>}
 
           <p className="mt-3 small text-muted">
             By logging in, you agree to our <a href="#terms">Terms & Conditions</a>
