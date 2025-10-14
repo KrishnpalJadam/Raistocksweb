@@ -6,7 +6,7 @@ export const fetchMarketPhases = createAsyncThunk(
   "marketPhase/fetchMarketPhases",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/users/market-phase"); // 👈 Update base URL if needed
+      const { data } = await axios.get("https://tradingapi-production-a52b.up.railway.app/api/users/market-phase"); // 👈 Update base URL if needed
       return data;
     } catch (error) {
       return rejectWithValue(

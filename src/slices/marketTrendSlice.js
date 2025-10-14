@@ -6,7 +6,7 @@ export const fetchMarketTrends = createAsyncThunk(
   "marketTrend/fetchMarketTrends",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("http://localhost:5000/api/users/market-trend"); // change URL if deployed
+      const response = await axios.get("https://tradingapi-production-a52b.up.railway.app/api/users/market-trend"); // change URL if deployed
       return response.data; // array of trends
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
