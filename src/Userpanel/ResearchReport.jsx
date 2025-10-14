@@ -9,6 +9,7 @@ import {
 } from "../slices/researchReportSlice";
 
 const ResearchReport = () => {
+  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
   const dispatch = useDispatch();
   const { reports, loading, error } = useSelector(
     (state) => state.researchReports
@@ -101,7 +102,7 @@ const ResearchReport = () => {
               </div>
 
               <a
-                href={`http://localhost:5000/api/research-reports/download/${report._id}`}
+                href={`${API_BASE}/api/research-reports/download/${report._id}`}
                 className="btn btn-primary btn-sm d-flex align-items-center"
                 target="_blank"
                 rel="noopener noreferrer"
