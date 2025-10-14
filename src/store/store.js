@@ -4,6 +4,9 @@ import marketInsightReducer from "../slices/marketInsightSlice";
 import marketPhaseReducer from "../slices/marketPhaseSlice";
 
 import marketTrendReducer from "../slices/marketTrendSlice";
+import tradeReducer from "../slices/tradeSlice";
+import researchReportReducer from "../slices/researchReportSlice";
+
 
 const store = configureStore({
   reducer: {
@@ -11,6 +14,8 @@ const store = configureStore({
     marketInsight: marketInsightReducer,
     marketPhase: marketPhaseReducer,
     marketTrend: marketTrendReducer,
+    trades: tradeReducer,
+    researchReports: researchReportReducer, // ✅ key matches selector in component
   },
 });
 

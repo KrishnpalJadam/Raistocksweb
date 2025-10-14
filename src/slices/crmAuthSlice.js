@@ -8,7 +8,7 @@ export const registerCRMUser = createAsyncThunk(
   "crm/register",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/register`, userData);
+      const response = await axios.post(`${API_URL}/api/crm/register`, userData);
       const data = response.data;
 
       // store user in localStorage

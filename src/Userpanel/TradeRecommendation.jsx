@@ -1,344 +1,262 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchTrades } from "../slices/tradeSlice"; // adjust import path
 import { Link } from "react-router-dom";
-import "./Trade.css"; // custom css
-import {  X, Filter } from "lucide-react";
+import "./Trade.css";
+import { X, Filter } from "lucide-react";
 
-
-
-
-const dummyTrades = [
-    {
-        id: 1,
-        title: "Buy Banknifty 56000 ce 31 july exp at 277",
-        status: "Closed",
-        type: "Index option | Intraday",
-        date: "July 29, 2025 12:12 PM",
-        entry: 277,
-        targets: [344, 384, 436],
-        stoploss: 207,
-        duration: "Today",
-        weightage: "6% of your capital or min. 1 lot",
-        lotSize: 30,
-        result: "Profit",
-        pnl: 5280,
-        updates: [
-            { type: "Book profit", text: "Everyone book profits here", price: 453, time: "July 29, 2:02 PM" },
-            { type: "Update", text: "3rd target done", price: 436, time: "July 29, 2:01 PM" },
-            { type: "Update", text: "", price: 402, time: "July 29, 1:54 PM" },
-        ]
-    },
-    {
-        id: 2,
-        title: "Buy Nifty 24600 ce 31 july exp at 172",
-        status: "Closed",
-        type: "Index option | Intraday",
-        date: "July 28, 2025 2:16 PM",
-        entry: 172,
-        targets: [242, 282, 352],
-        stoploss: 134,
-        duration: "Tomorrow",
-        weightage: "6% of your capital or min. 1 lot",
-        lotSize: 75,
-        result: "Profit",
-        pnl: 5925,
-        updates: [
-            { type: "Book profit", text: "1st target done, exit your position", price: 251, time: "July 29, 2:03 PM" },
-            { type: "Update", text: "Carry this position", price: 184, time: "July 28, 2:45 PM" },
-            { type: "Update", text: "", price: 184, time: "July 28, 2:44 PM" },
-        ]
-    },
-    {
-        id: 3,
-        title: "Buy Sun Pharma at 1699",
-        status: "Live",
-        type: "Cash | Swing",
-        date: "July 25, 2025 1:11 PM",
-        entry: 1699,
-        targets: [1802, 1840],
-        stoploss: "NA",
-        duration: "1 to 3 Months",
-        weightage: "8% of your capital",
-        updates: [
-            { type: "Update", text: "+1.52%", price: 1725, time: "July 30, 2025 10:12 AM", live: true },
-            { type: "Update", text: "+0.7%", price: 1711, time: "July 29, 2025 11:15 AM", live: true },
-        ]
-    },
-    {
-        id: 4,
-        title: "Buy RVNL at 375",
-        status: "Live",
-        type: "Cash | Swing",
-        date: "July 24, 2025 11:29 AM",
-        entry: 375,
-        targets: [404, 412, 426],
-        stoploss: "NA",
-        duration: "1 to 3 Months",
-        weightage: "8% of your capital",
-    },
-    {
-        id: 5,
-        title: "Buy Banknifty 56000 ce 31 july exp at 364",
-        status: "Closed",
-        type: "Index option | Intraday",
-        date: "July 28, 2025 1:56 PM",
-        entry: 364,
-        targets: [420, 460],
-        stoploss: 320,
-        duration: "Today",
-        weightage: "5% of your capital or min. 1 lot",
-        lotSize: 25,
-        result: "Loss",
-        pnl: -2400,
-    },
-    {
-        id: 6,
-        title: "Buy Varun Beverage (VBL) at 486",
-        status: "Closed",
-        type: "Cash | Swing",
-        date: "July 28, 2025 10:43 AM",
-        entry: 486,
-        targets: [520, 540],
-        stoploss: 460,
-        duration: "1 to 3 Months",
-        weightage: "7% of your capital",
-        result: "Loss",
-        pnl: -1500,
-    },
-    {
-        id: 7,
-        title: "Buy LIC at 922",
-        status: "Live",
-        type: "Cash | Swing",
-        date: "July 25, 2025 10:30 AM",
-        entry: 922,
-        targets: [980, 1020],
-        stoploss: 880,
-        duration: "15 Days",
-        weightage: "5% of your capital",
-    },
-];
-// === Filter Modal Component ===
+// === Filter Modal Component (same as your original) ===
 const FilterModal = ({ show, onClose }) => {
-    if (!show) return null;
+  if (!show) return null;
 
-    return (
-        <div className="modal-overlay">
-            <div className="modal-content p-4">
-                {/* Header */}
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h5 className="fw-bold">Apply Filter</h5>
-                    <button
-                        className="btn btn-light rounded-circle shadow-sm"
-                        onClick={onClose}
-                        style={{ width: "40px", height: "40px" }}
-                    >
-                        <X  />
-                    </button>
-                </div>
-
-                {/* Filter By Segment */}
-                <div className="mb-3">
-                    <label className="fw-bold d-block mb-2">Filter By Segment</label>
-                    <div>
-                        <input type="radio" name="segment" id="cash" defaultChecked />{" "}
-                        <label htmlFor="cash">Cash</label>{" "}
-                        <input type="radio" name="segment" id="fno" />{" "}
-                        <label htmlFor="fno">Futures & Options</label>
-                    </div>
-                    <button className="btn btn-sm btn-outline-primary mt-2">Apply</button>
-                </div>
-
-                {/* Filter By Date */}
-                <div className="mb-3">
-                    <label className="fw-bold d-block mb-2">Filter By Date</label>
-                    <div className="d-flex gap-2">
-                        <input type="date" className="form-control" />
-                        <input type="date" className="form-control" />
-                    </div>
-                    <button className="btn btn-sm btn-outline-primary mt-2">Apply</button>
-                </div>
-
-                {/* Check Accuracy */}
-                <div className="mb-3">
-                    <label className="fw-bold d-block mb-2">Check Accuracy</label>
-                    <div className="d-flex gap-2 mb-2">
-                        <select className="form-select">
-                            <option>All</option>
-                            <option>Cash</option>
-                            <option>F&O</option>
-                        </select>
-                        <input type="date" className="form-control" />
-                        <input type="date" className="form-control" />
-                    </div>
-                    <button className="btn btn-sm btn-outline-success">Compute</button>
-                </div>
-
-                {/* Profit Generated */}
-                <div className="mb-3">
-                    <label className="fw-bold d-block mb-2">Profit Generated</label>
-                    <div className="d-flex gap-2 mb-2">
-                        <select className="form-select">
-                            <option>Cash</option>
-                            <option>F&O</option>
-                        </select>
-                        <input type="date" className="form-control" />
-                        <input type="date" className="form-control" />
-                    </div>
-                    <button className="btn btn-sm btn-outline-success">Compute</button>
-                </div>
-
-                {/* Footnote */}
-               
-            </div>
+  return (
+    <div className="modal-overlay">
+      <div className="modal-content p-4">
+        {/* Header */}
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="fw-bold">Apply Filter</h5>
+          <button
+            className="btn btn-light rounded-circle shadow-sm"
+            onClick={onClose}
+            style={{ width: "40px", height: "40px" }}
+          >
+            <X />
+          </button>
         </div>
-    );
+
+        {/* Filter By Segment */}
+        <div className="mb-3">
+          <label className="fw-bold d-block mb-2">Filter By Segment</label>
+          <div>
+            <input type="radio" name="segment" id="cash" defaultChecked />{" "}
+            <label htmlFor="cash">Cash</label>{" "}
+            <input type="radio" name="segment" id="fno" />{" "}
+            <label htmlFor="fno">Futures & Options</label>
+          </div>
+          <button className="btn btn-sm btn-outline-primary mt-2">Apply</button>
+        </div>
+
+        {/* Filter By Date */}
+        <div className="mb-3">
+          <label className="fw-bold d-block mb-2">Filter By Date</label>
+          <div className="d-flex gap-2">
+            <input type="date" className="form-control" />
+            <input type="date" className="form-control" />
+          </div>
+          <button className="btn btn-sm btn-outline-primary mt-2">Apply</button>
+        </div>
+
+        {/* Check Accuracy */}
+        <div className="mb-3">
+          <label className="fw-bold d-block mb-2">Check Accuracy</label>
+          <div className="d-flex gap-2 mb-2">
+            <select className="form-select">
+              <option>All</option>
+              <option>Cash</option>
+              <option>F&O</option>
+            </select>
+            <input type="date" className="form-control" />
+            <input type="date" className="form-control" />
+          </div>
+          <button className="btn btn-sm btn-outline-success">Compute</button>
+        </div>
+
+        {/* Profit Generated */}
+        <div className="mb-3">
+          <label className="fw-bold d-block mb-2">Profit Generated</label>
+          <div className="d-flex gap-2 mb-2">
+            <select className="form-select">
+              <option>Cash</option>
+              <option>F&O</option>
+            </select>
+            <input type="date" className="form-control" />
+            <input type="date" className="form-control" />
+          </div>
+          <button className="btn btn-sm btn-outline-success">Compute</button>
+        </div>
+      </div>
+    </div>
+  );
 };
-// Helper component for the trade information rows
+
+// === Helper Components ===
 const TradeInfoRow = ({ label, value, className = "" }) => (
-    <div className={`trade-info-row ${className}`}>
-        <span className="trade-info-label">{label}</span>
-        <span className="trade-info-value">{value}</span>
-    </div>
+  <div className={`trade-info-row ${className}`}>
+    <span className="trade-info-label">{label}</span>
+    <span className="trade-info-value">{value}</span>
+  </div>
 );
 
-// Helper component for the Updates/Profit Booking pills
 const TradeUpdatePill = ({ update }) => (
-    <div className={`trade-update-pill ${update.type.toLowerCase().replace(' ', '-')}`}>
-        <div className="update-price-time">
-            <span className="update-price">
-                ₹{update.price}
-                {update.text && update.live ? <span className={`update-percentage ${update.text.startsWith('+') ? 'profit-text' : 'loss-text'}`}> {update.text}</span> : ''}
-            </span>
-            <span className="update-time">{update.time}</span>
-        </div>
-        {update.type === "Book profit" && (
-            <div className="update-text">{update.text}</div>
+  <div className={`trade-update-pill ${update.type?.toLowerCase().replace(" ", "-")}`}>
+    <div className="update-price-time">
+      <span className="update-price">
+        ₹{update.price}
+        {update.text && update.live ? (
+          <span
+            className={`update-percentage ${
+              update.text.startsWith("+") ? "profit-text" : "loss-text"
+            }`}
+          >
+            {" "}
+            {update.text}
+          </span>
+        ) : (
+          ""
         )}
-        {update.type === "Update" && !update.live && (
-            <div className="update-text">
-                {update.text || (update.price >= 400 ? '3rd target done' : '')}
-            </div>
-        )}
+      </span>
+      <span className="update-time">{update.time}</span>
     </div>
+    {update.type === "Book profit" && (
+      <div className="update-text">{update.text}</div>
+    )}
+    {update.type === "Update" && !update.live && (
+      <div className="update-text">
+        {update.text || (update.price >= 400 ? "3rd target done" : "")}
+      </div>
+    )}
+  </div>
 );
 
+// === Main Component ===
 const TradeRecommendation = () => {
-    const [showFilter, setShowFilter] = useState(false);
-    const [activeTab, setActiveTab] = useState("Recent");
-    // Filtering logic based on the active tab
-    const filteredTrades = dummyTrades.filter((t) =>
-        activeTab === "Recent" ? t.status === "Closed" : t.status === "Live"
-    );
+  const dispatch = useDispatch();
+  const { trades, loading } = useSelector((state) => state.trades);
 
-    // Determine the primary border color
-    const getBorderClass = (trade) => {
-        if (trade.status === "Live") return "trade-card live-border";
-        if (trade.result === "Profit") return "trade-card profit-border";
-        if (trade.result === "Loss") return "trade-card loss-border";
-        return "trade-card";
-    };
+  const [showFilter, setShowFilter] = useState(false);
+  const [activeTab, setActiveTab] = useState("Recent");
 
-    return (
-        <div className="trade-container">
-            <div className="d-flex  justify-content-between">
-                <h4 className="fw-bold">Trade Recommendation</h4>
-                {/* Filter Modal */}
-                <Link
-                    to="/customer/dashboard"
-                    className="d-flex align-items-center justify-content-center text-dark 
+  useEffect(() => {
+    dispatch(fetchTrades());
+  }, [dispatch]);
+
+  const filteredTrades = trades.filter((t) =>
+    activeTab === "Recent" ? t.status === "Closed" : t.status === "Live"
+  );
+
+  const getBorderClass = (trade) => {
+    if (trade.status === "Live") return "trade-card live-border";
+    if (trade.result === "Profit") return "trade-card profit-border";
+    if (trade.result === "Loss") return "trade-card loss-border";
+    return "trade-card";
+  };
+
+  return (
+    <div className="trade-container">
+      <div className="d-flex justify-content-between">
+        <h4 className="fw-bold">Trade Recommendation</h4>
+        <Link
+          to="/customer/dashboard"
+          className="d-flex align-items-center justify-content-center text-dark 
              bg-white border rounded-pill shadow-sm"
-                    style={{ width: "36px", height: "36px" }}
+          style={{ width: "36px", height: "36px" }}
+        >
+          <X size={20} />
+        </Link>
+      </div>
+
+      {/* Tabs */}
+      <div className="trade-tabs">
+        <button
+          className={`tab-btn ${activeTab === "Recent" ? "active" : ""}`}
+          onClick={() => setActiveTab("Recent")}
+        >
+          Recent Trades
+        </button>
+        <button
+          className={`tab-btn ${activeTab === "Live" ? "active" : ""}`}
+          onClick={() => setActiveTab("Live")}
+        >
+          Live Trades
+        </button>
+        <button
+          className="d-flex mt-2 align-items-center filter justify-content-center text-dark bg-white border rounded-2 shadow-sm"
+          style={{ height: "35px" }}
+          onClick={() => setShowFilter(true)}
+        >
+          <Filter className="me-2" size={18} /> Filter
+        </button>
+      </div>
+
+      {/* Grid */}
+      {loading ? (
+        <div className="text-center mt-5">Loading trades...</div>
+      ) : (
+        <div className="trade-grid">
+          {filteredTrades.map((trade) => (
+            <div key={trade._id} className={getBorderClass(trade)}>
+              <div className="trade-header">
+                <h3 className="trade-title">
+                  {trade.action} {trade.on} at ₹{trade.entryPrice}
+                </h3>
+                <div className={`status-tag ${trade.status.toLowerCase()}`}>
+                  {trade.status}
+                </div>
+              </div>
+
+              <div className="trade-meta">
+                <span className="trade-date-time">
+                  {new Date(trade.recommendationDateTime).toLocaleString()}
+                </span>
+                <span className="trade-type">
+                  {trade.segment} | {trade.tradeType}
+                </span>
+              </div>
+
+              <div className="trade-details-grid">
+                <TradeInfoRow label="Entry" value={`₹${trade.entryPrice}`} />
+                <TradeInfoRow
+                  label="Stoploss"
+                  value={trade.stoploss || "N/A"}
+                />
+                <TradeInfoRow label="Duration" value={trade.timeDuration} />
+                <TradeInfoRow
+                  label="Weightage"
+                  value={`${trade.weightageValue}${trade.weightageExtension}`}
+                />
+                {trade.lotSize && (
+                  <TradeInfoRow label="Lot Size" value={trade.lotSize} />
+                )}
+              </div>
+
+              <div className="d-flex justify-content-between">
+                <div className="mt-4">
+                  <button className="butonsss text-muted">Update</button>
+                </div>
+                <div>
+                  {trade.updates &&
+                    trade.updates.map((update, index) => (
+                      <TradeUpdatePill key={index} update={update} />
+                    ))}
+                </div>
+              </div>
+
+              {trade.status === "Closed" && (
+                <div
+                  className={`pnl-summary ${
+                    trade.result === "Profit" ? "profit" : "loss"
+                  }`}
                 >
-                    <X size={20} />
-                </Link>
+                  {trade.result === "Profit" ? "▲" : "▼"} ₹
+                  {Math.abs(trade.pnl || 0).toLocaleString()}
+                </div>
+              )}
+              {trade.status === "Live" && (
+                <div className="pnl-summary live-status">Live</div>
+              )}
             </div>
-            {/* 1. Tabs Navigation */}
-            <div className="trade-tabs">
-                <button
-                    className={`tab-btn ${activeTab === "Recent" ? "active" : ""}`}
-                    onClick={() => setActiveTab("Recent")}
-                >
-                    Recent Trades
-                </button>
-                <button
-                    className={`tab-btn ${activeTab === "Live" ? "active" : ""}`}
-                    onClick={() => setActiveTab("Live")}
-                >
-                    Live Trades
-                </button>
-                <button
-                        className="d-flex mt-2 align-items-center filter justify-content-center text-dark bg-white border rounded-2 shadow-sm"
-                        style={{ height: "35px" }}
-                        onClick={() => setShowFilter(true)}
-                    >
-                        <Filter className="me-2" size={18} /> Filter
-                    </button>
-            </div>
-
-            {/* 4. Responsive Grid */}
-            <div className="trade-grid">
-                {filteredTrades.map((trade) => (
-                    <div key={trade.id} className={getBorderClass(trade)}>
-                        {/* Trade Header */}
-                        <div className="trade-header">
-                            <h3 className="trade-title">{trade.title}</h3>
-                            <div className={`status-tag ${trade.status.toLowerCase()}`}>
-                                {trade.status}
-                            </div>
-                        </div>
-
-                        <div className="trade-meta">
-                            <span className="trade-date-time">{trade.date}</span>
-                            <span className="trade-type">{trade.type}</span>
-                        </div>
-
-                        {/* Trade Details Grid */}
-                        <div className="trade-details-grid">
-                            <TradeInfoRow label="Entry" value={`₹${trade.entry}`} className="entry-row" />
-                            <TradeInfoRow label="Target(s)" value={trade.targets.join(", ")} />
-                            <TradeInfoRow label="Stoploss" value={trade.stoploss} />
-                            <TradeInfoRow label="Duration" value={trade.duration} />
-                            <TradeInfoRow label="Weightage" value={trade.weightage} />
-                            {trade.lotSize && (
-                                <TradeInfoRow label="Lot Size" value={trade.lotSize} />
-                            )}
-                        </div>
-
-                        <div className="d-flex justify-content-between">
-                            <div className="mt-4">
-                                <button className="butonsss text-muted">Update</button>
-                            </div>
-                            <div>
-                                {trade.updates && trade.updates.map((update, index) => (
-                                    <TradeUpdatePill key={index} update={update} />
-                                ))}
-                            </div>
-
-                        </div>
-
-
-                        {/* P&L/Live Status Footer */}
-                        {trade.status === "Closed" && (
-                            <div
-                                className={`pnl-summary ${trade.result === "Profit" ? "profit" : "loss"
-                                    }`}
-                            >
-                                {trade.result === "Profit" ? "▲" : "▼"} ₹{Math.abs(trade.pnl).toLocaleString()}
-                            </div>
-                        )}
-                        {trade.status === "Live" && (
-                            <div className="pnl-summary live-status">Live</div>
-                        )}
-                    </div>
-                ))}
-
-            </div>
-            <FilterModal show={showFilter} onClose={() => setShowFilter(false)} />
+          ))}
         </div>
-    );
+      )}
+
+      {/* Filter Modal */}
+      <FilterModal show={showFilter} onClose={() => setShowFilter(false)} />
+    </div>
+  );
 };
 
 export default TradeRecommendation;
+
 
 
 
