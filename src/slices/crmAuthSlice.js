@@ -1,21 +1,25 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/crm";
+const API_URL = `${
+  import.meta.env.VITE_API_URL || "http://localhost:5000"
+}/api/crm`;
 
 // ✅ Register and auto-login
 export const registerCRMUser = createAsyncThunk(
   "crm/register",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/api/crm/register`, userData);
+      const response = await axios.post(`${API_URL}/register`, userData);
       const data = response.data;
 
       // store user in localStorage
       localStorage.setItem("crmUser", JSON.stringify(data));
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Registration failed");
+      return rejectWithValue(
+        error.response?.data?.message || "Registration failed"
+      );
     }
   }
 );
@@ -46,7 +50,10 @@ export const logoutCRMUser = createAsyncThunk("crm/logout", async () => {
 const crmAuthSlice = createSlice({
   name: "crmAuth",
   initialState: {
-    user: typeof window !== "undefined" ? JSON.parse(localStorage.getItem("crmUser")) || null : null,
+    user:
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("crmUser")) || null
+        : null,
     loading: false,
     error: null,
   },

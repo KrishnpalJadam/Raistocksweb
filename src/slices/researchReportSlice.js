@@ -2,7 +2,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/research-reports"; // Adjust base path if needed
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = `${API_BASE}/api/research-reports`; // Adjust base path if needed
 
 // --- Fetch all reports ---
 export const fetchResearchReports = createAsyncThunk(

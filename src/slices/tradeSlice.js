@@ -2,7 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // 🟢 API base URL
-const API_URL = "http://localhost:5000/api/trades"; // change if needed
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = `${API_BASE}/api/trades`;
 
 // 🧾 Fetch all trades
 export const fetchTrades = createAsyncThunk("trades/fetchAll", async () => {

@@ -2,7 +2,10 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // ✅ Adjust API base URL if needed
-const API_URL = "https://tradingapi-production-a52b.up.railway.app/api/market-insights";
+const API_URL = `${
+  import.meta.env.VITE_API_URL ||
+  "https://tradingapi-production-a52b.up.railway.app"
+}/api/market-insights`;
 
 // ========== Thunk: Fetch All Market Insights ==========
 export const fetchMarketInsights = createAsyncThunk(

@@ -6,7 +6,10 @@ export const fetchMarketPhases = createAsyncThunk(
   "marketPhase/fetchMarketPhases",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get("https://tradingapi-production-a52b.up.railway.app/api/users/market-phase"); // 👈 Update base URL if needed
+      const base =
+        import.meta.env.VITE_API_URL ||
+        "https://tradingapi-production-a52b.up.railway.app";
+      const { data } = await axios.get(`${base}/api/users/market-phase`); // 👈 uses VITE_API_URL if set
       return data;
     } catch (error) {
       return rejectWithValue(
