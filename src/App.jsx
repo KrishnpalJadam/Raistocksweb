@@ -17,6 +17,8 @@ import ResearchReport from "./Userpanel/ResearchReport";
 import ModelPortfolio from "./Userpanel/ModelPortfolio";
 import TradeDiary from "./Userpanel/TradeDiary";
 import Footer from "./Layout/Footer";
+import About from "./Components/About";
+import ContactUs from "./Components/ContactUs";
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -34,6 +36,8 @@ const AppWrapper = () => {
         {/* Website Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contactUs" element={<ContactUs />} />
 
         {/* Customer Panel */}
         <Route path="/customer/*" element={<MainLayout />}>

@@ -744,4 +744,314 @@ a {
   margin-right: 0.75rem;
 }
 
-a
+ /* --- Features Section Styling --- */
+        .feature-card {
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            min-height: 200px;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+.feature-icon-wrapper2{
+  background-color: #e53935 !important;
+}
+        .feature-icon-wrapper {
+            background-color: var(--bs-primary);
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* --- Never Expect Section Styling --- */
+        .never-expect-section {
+            background-color: var(--bs-light-gray);
+            padding: 4rem 0;
+        }
+
+        .never-expect-card {
+            background-color: #fff;
+            border: 2px solid var(--bs-danger);
+            border-radius: 1rem;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .never-expect-card:hover {
+            background-color: rgba(220, 53, 69, 0.05);
+        }
+
+        .never-expect-icon {
+            color: var(--bs-danger);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- Illustrations/Past Performance Section --- */
+        .illustration-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.75rem;
+            transition: box-shadow 0.3s;
+        }
+
+        .illustration-card:hover {
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.2);
+        }
+
+        /* --- Trial Section CTA --- */
+        .trial-cta-section {
+            background: linear-gradient(45deg, #0d6efd 0%, #007bff 100%);
+            color: #fff;
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Background bar chart for CTA - subtle */
+        .trial-cta-section::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23ffffff1a' d='M0 100 L10 80 L10 100 Z M15 100 L25 70 L25 100 Z M30 100 L40 90 L40 100 Z M45 100 L55 60 L55 100 Z M60 100 L70 85 L70 100 Z M75 100 L85 95 L85 100 Z M90 100 L100 75 L100 100 Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: 15% 100%;
+            background-repeat: repeat-x;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        .trial-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .trial-checklist li {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .trial-checklist .bi {
+            color: #8cff8c; /* Light green checkmark */
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .btn-trial-cta {
+            background-color: #fff;
+            color: var(--bs-primary) !important;
+            font-weight: 700;
+            border-radius: 50rem;
+            padding: 0.75rem 2.5rem;
+            font-size: 1.25rem;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-trial-cta:hover {
+            background-color: #eee;
+            transform: scale(1.05);
+        }
+
+        /* --- Footer Styling --- */
+        .footer-custom {
+          
+            color: #ccc;
+            padding: 3rem 0;
+            font-size: 0.9rem;
+        }
+
+        .footer-custom a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-custom a:hover {
+            color: var(--bs-primary);
+        }
+
+        .footer-logo-text {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #fff;
+        }
+
+        .social-icon {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        /* --- Helper Classes --- */
+        .text-sebi {
+            font-size: 0.9rem;
+            font-weight: 300;
+            opacity: 0.8;
+            margin-top: -1rem;
+        }
+
+        .performance-badge-success {
+            background-color: #198754;
+            color: #fff;
+            font-weight: 700;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.75rem;
+        }
+
+        .performance-badge-danger {
+            background-color: var(--bs-danger);
+            color: #fff;
+            font-weight: 700;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.75rem;
+        }
+
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #0d6efd;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0056b3;
+        }
+
+
+
+        .web-about-hero {
+  background: linear-gradient(135deg, #002366 0%, #0055cc 100%);
+  min-height: 60vh;
+  color: white;
+  text-align: center;
+  position: relative;
+}
+
+.web-about-hero h1 {
+  font-size: 2.5rem;
+}
+
+.web-about-values {
+  background: #fff;
+}
+
+.web-about-card {
+  transition: all 0.3s ease-in-out;
+  border: 1px solid #f0f0f0;
+}
+
+.web-about-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-color: #dbe8ff;
+}
+
+.web-about-icon svg {
+  background: #e9f0ff;
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.web-about-vision {
+  background: #f8fafc;
+}
+
+@media (max-width: 767px) {
+  .web-about-hero {
+    padding: 60px 15px;
+    min-height: auto;
+  }
+
+  .web-about-hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .web-about-card {
+    padding: 1.5rem;
+  }
+}
+
+
+
+
+.web-contact-hero {
+  background: linear-gradient(135deg, #002366 0%, #0055cc 100%);
+  min-height: 55vh;
+  color: white;
+  text-align: center;
+}
+
+.web-contact-card {
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease-in-out;
+}
+
+.web-contact-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-color: #dbe8ff;
+}
+
+.web-contact-social {
+  color: #002366;
+  background: #e9f0ff;
+  border-radius: 50%;
+  padding: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.web-contact-social:hover {
+  background: #002366;
+  color: white;
+}
+
+.web-contact-form-box {
+  border: 1px solid #e0e0e0;
+}
+
+.web-contact-form .form-control:focus {
+  box-shadow: none;
+  border-color: #0055cc;
+}
+
+.web-contact-form label {
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .web-contact-hero {
+    padding: 60px 15px;
+    min-height: auto;
+  }
+
+  .web-contact-form-box {
+    padding: 1.5rem;
+  }
+}
