@@ -90,46 +90,39 @@ const TradeInfoRow = ({ label, value, className = "" }) => (
 
 const TradeActions = ({ tradeId }) => {
   const dispatch = useDispatch();
-  const tradeActionsState = useSelector((state) => state.tradeActions || {});
-
-  const actionsByTrade = tradeActionsState.actionsByTrade || {};
-  const actions = Array.isArray(actionsByTrade[tradeId])
-    ? actionsByTrade[tradeId]
-    : Array.isArray(tradeActionsState.actions)
-    ? tradeActionsState.actions
-    : [];
-  const loading = !!tradeActionsState.loading;
+  const { actions, loading } = useSelector(
+    (state) => state.tradeActions || { actions: [], loading: false }
+  );
 
   useEffect(() => {
     if (tradeId) {
-      // fetch only if we don't already have actions for this tradeId
-      if (!Array.isArray(actionsByTrade[tradeId])) {
-        dispatch(fetchTradeActions(tradeId));
-      }
+      dispatch(fetchTradeActions(tradeId));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tradeId, dispatch]);
 
-  // filter actions to those that belong to this tradeId (some APIs return many)
-  const matched = actions.filter((a) => {
-    // action may have tradeId, trade, or parent reference; try common fields
-    return (
-      a.tradeId === tradeId ||
-      a.trade === tradeId ||
-      a.tradeId === String(tradeId) ||
-      a.trade === String(tradeId) ||
-      a._trade === tradeId
-    );
-  });
+  // Filter actions to only show those matching this trade's ID
+  const tradeActions = actions.filter(
+    (action) =>
+      action.tradeId === tradeId ||
+      action.trade_id === tradeId ||
+      action._tradeId === tradeId
+  );
 
-  if (loading) return <div>Loading actions...</div>;
-  if (!matched || matched.length === 0) return null;
+  if (loading && !tradeActions.length) {
+    return (
+      <div className="trade-actions mt-3 text-center text-gray-500">
+        Loading actions...
+      </div>
+    );
+  }
+
+  if (!tradeActions.length) return null;
 
   return (
     <div className="trade-actions mt-3">
       <h6 className="fw-bold mb-3">Trade Actions</h6>
       <div className="flex flex-col gap-3">
-        {matched.map((action) => {
+        {tradeActions.map((action) => {
           const dateStr =
             action.createdAt || action.createdDateAt || action.createdAtDate;
           const displayDate = dateStr
@@ -144,22 +137,16 @@ const TradeActions = ({ tradeId }) => {
               <div className="flex items-center gap-2">
                 <div
                   className={`px-4 py-2 rounded ${
-                    action.type === "update"
+                    action.type?.toLowerCase() === "update"
                       ? "bg-blue-100 text-blue-700"
-                      : action.type === "bookProfit" ||
-                        action.type === "Book profit" ||
-                        action.type === "Book Profit"
+                      : action.type?.toLowerCase().includes("profit")
                       ? "bg-green-100 text-green-700"
+                      : action.type
+                      ? "bg-gray-100 text-gray-700"
                       : "bg-red-100 text-red-700"
                   }`}
                 >
-                  {action.type === "update" || action.type === "Update"
-                    ? "Update"
-                    : action.type === "bookProfit" ||
-                      action.type === "Book profit" ||
-                      action.type === "Book Profit"
-                    ? "Book Profit"
-                    : "Stop Loss Hit"}
+                  {action.type ? action.type : "Unknown"}
                 </div>
               </div>
               <div className="flex flex-col items-end">
@@ -296,12 +283,9 @@ const TradeRecommendation = () => {
                   {new Date(trade.recommendationDateTime).toLocaleString()}
                 </span>
 
-                  <button className="butonsss text-muted">
-                    {trade.segment} | {trade.tradeType}
-                  </button>
-          
-
-               
+                <button className="butonsss text-muted">
+                  {trade.segment} | {trade.tradeType}
+                </button>
               </div>
 
               <div className="trade-details-grid">

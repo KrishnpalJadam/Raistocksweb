@@ -7,6 +7,7 @@ import tradeActionsReducer from "../slices/tradeActionsSlice";
 import marketTrendReducer from "../slices/marketTrendSlice";
 import tradeReducer from "../slices/tradeSlice";
 import researchReportReducer from "../slices/researchReportSlice";
+import userTradeFormReducer from "../slices/userTradeFormSlice"; // Import the new slice
 
 const store = configureStore({
   reducer: {
@@ -16,7 +17,8 @@ const store = configureStore({
     tradeActions: tradeActionsReducer,
     marketTrend: marketTrendReducer,
     trades: tradeReducer,
-    researchReports: researchReportReducer, // ✅ key matches selector in component
+    researchReports: researchReportReducer, 
+     userTradeForm: userTradeFormReducer, // Add this line
   },
 });
 

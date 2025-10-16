@@ -25,16 +25,14 @@ const tradeActionsSlice = createSlice({
   name: "tradeActions",
   initialState: {
     actions: [],
-    // keep actionsByTrade to store arrays keyed by tradeId to avoid collisions
-    actionsByTrade: {},
     loading: false,
     error: null,
   },
   reducers: {
     clearTradeActions: (state) => {
       state.actions = [];
-      state.error = null;
       state.loading = false;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -45,13 +43,12 @@ const tradeActionsSlice = createSlice({
       })
       .addCase(fetchTradeActions.fulfilled, (state, action) => {
         state.loading = false;
-        // action.meta.arg contains the tradeId passed to the thunk
-        const tradeId = action.meta?.arg;
-        if (tradeId) {
-          state.actionsByTrade[tradeId] = action.payload;
-        }
-        // also keep the flat actions array for compatibility
-        state.actions = action.payload;
+        // Add new actions to the existing ones, avoiding duplicates by ID
+        const existingIds = new Set(state.actions.map((a) => a._id || a.id));
+        const newActions = action.payload.filter(
+          (a) => !existingIds.has(a._id || a.id)
+        );
+        state.actions = [...state.actions, ...newActions];
       })
       .addCase(fetchTradeActions.rejected, (state, action) => {
         state.loading = false;
