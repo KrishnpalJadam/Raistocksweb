@@ -1,0 +1,52 @@
+/* Dark transparent backdrop */
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+/* Modal card */
+.modal-dialog-custom {
+  background: #fff;
+  border-radius: 1rem;
+  max-width: 450px;
+  width: 100%;
+  padding: 2rem;
+  position: relative;
+}
+
+/* Close button */
+.btn-close-custom {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6c757d;
+}
+
+.btn-close-custom:hover {
+  color: #000;
+}
+
+/* Modal header */
+.modal-header-custom h5 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.modal-header-custom p {
+  margin-top: 0.25rem;
+}
+
+/* Form styling overrides (optional) */
+.modal-form .form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+  border-color: #0d6efd;
+}

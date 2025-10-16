@@ -1,0 +1,69 @@
+.rai-final-cta {
+  position: relative;
+  color: white;
+  padding: 80px 20px;
+  overflow: hidden;
+  background: #1a1a1a;
+  text-align: center;
+}
+
+.rai-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+   background: radial-gradient(circle at 30% 30%, #1c5ce3, #102b66);
+}
+
+.rai-background canvas {
+  display: block;
+}
+
+.rai-final-content {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.subheading {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #f0f0f0;
+}
+
+
+.details {
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.trial-features {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 25px;
+}
+
+.trial-features li {
+  margin: 8px 0;
+  font-size: 15px;
+}
+
+.rai-final-btn {
+  display: inline-block;
+  padding: 12px 30px;
+  background: #fff;
+  color: black;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.rai-final-btn:hover {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+}

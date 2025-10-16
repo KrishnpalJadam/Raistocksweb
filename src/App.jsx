@@ -20,8 +20,10 @@ import Footer from "./Layout/Footer";
 import About from "./Components/About";
 import ContactUs from "./Components/ContactUs";
 import Trader from "./Components/Trader";
-import Investor from "./Layout/Investor";
+
 import Ourplan from "./Components/Ourplan";
+import { useEffect } from "react";
+import Investor from "./Components/Investor";
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -29,7 +31,10 @@ const AppWrapper = () => {
   // Conditions
   const isAuthRoute = location.pathname === "/login";
   const isCustomerRoute = location.pathname.startsWith("/customer/");
-
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   return (
     <>
       {/* Header Website me hi show karega */}

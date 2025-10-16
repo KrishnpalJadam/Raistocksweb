@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
+import SubscribeModal from './SubscribeModal';
 
 // --- Investor Plans ---
 const investorPlans = [
@@ -133,7 +134,7 @@ const traderPlans = [
 ];
 
 // --- Pricing Card Component ---
-const PricingCard = ({ plan }) => (
+const PricingCard = ({  plan, onSubscribe  }) => (
   <div className={`pricing-card-container ${plan.isPopular ? 'popular-card' : ''}`}>
     {plan.isPopular && <div className="popular-tag">MOST POPULAR</div>}
 
@@ -154,7 +155,13 @@ const PricingCard = ({ plan }) => (
     </div>
 
     <div className="card-cta-group">
-      <button className={`btn-cta w-full ${plan.buttonClass}`}>Subscribe Now</button>
+      <button
+        className={`btn-cta w-full ${plan.buttonClass}`}
+        onClick={onSubscribe}
+      >
+        Subscribe Now
+      </button>
+
     </div>
 
     <div className="card-features">
@@ -176,7 +183,18 @@ const Ourplan = () => {
 
   // dynamically choose plan set
   const currentPlans = activeSegment === 'Trader' ? traderPlans : investorPlans;
+  // Inside your Ourplan component
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handleSubscribeClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalSubmit = (data) => {
+    console.log("User Data:", data);
+    setIsModalOpen(false);
+    // Here you can redirect to payment or call API
+  };
   return (
     <div className="ourplan-wrapper">
       <div className="content-container p-5">
@@ -201,9 +219,18 @@ const Ourplan = () => {
         {/* Pricing Cards */}
         <div className="pricing-grid">
           {currentPlans.map((plan) => (
-            <PricingCard key={plan.id} plan={plan} />
+            <PricingCard
+              key={plan.id}
+              plan={plan}
+              onSubscribe={() => handleSubscribeClick()}
+            />
           ))}
         </div>
+        <SubscribeModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleModalSubmit}
+        />
       </div>
     </div>
   );
