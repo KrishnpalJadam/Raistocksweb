@@ -15,16 +15,17 @@ const Header = () => {
     {
       name: "Services",
       submenu: [
-        { name: "Equity", href: "#equity" },
-        { name: "Commodities", href: "#commodities" },
-        { name: "Forex", href: "#forex" },
+        { name: "Trader", to: "/trader" },
+        { name: "Investor", to: "/investor" },
       ],
     },
     {
       name: "Calculators",
       submenu: [
-        { name: "SIP Calculator", href: "#sip" },
-        { name: "EMI Calculator", href: "#emi" },
+        { name: "SIP", to: "#sip" },
+        { name: "SWP", to: "/" },
+        { name: "Rai Mambership Billng", to: "/" },
+        { name: "Special", to: "/" },
       ],
     },
     { name: "Contact", to: "/contactUs" },
@@ -43,8 +44,8 @@ const Header = () => {
   };
 
   return (
-    <header className="shadow-sm sticky-top bg-white" style={{ zIndex: 1050 }}>
-      <nav className="navbar navbar-expand-lg navbar-light container">
+    <header className="shadow-sm">
+      <nav className="navbar navbar-expand-lg  container">
         <Link className="navbar-brand d-flex align-items-center" to="/">
           <img src={logo} alt="RAI Logo" style={{ height: 60 }} />
         </Link>
@@ -67,7 +68,7 @@ const Header = () => {
               item.submenu ? (
                 <li className="nav-item dropdown" key={idx}>
                   <a
-                    className={`nav-link dropdown-toggle position-relative ${isActive(item) ? "text-primary" : "text-dark"}`}
+                    className={`nav-link dropdown-toggle position-relative ${isActive(item) ? "text-primary" : "text-black"}`}
                     href="#!"
                     role="button"
                     data-bs-toggle="dropdown"
@@ -80,12 +81,12 @@ const Header = () => {
                   <ul className="dropdown-menu shadow rounded-3">
                     {item.submenu.map((sub, i) => (
                       <li key={i}>
-                        <a
+                        <Link
                           className="dropdown-item text-dark fw-medium hover-bg-primary"
-                          href={sub.href}
+                          to={sub.to}
                         >
                           {sub.name}
-                        </a>
+                        </Link>
                       </li>
                     ))}
                   </ul>
@@ -94,7 +95,7 @@ const Header = () => {
                 <li className="nav-item" key={idx}>
                   <Link
                     to={item.to}
-                    className={`nav-link fw-medium ${isActive(item) ? "text-primary border-bottom border-2 border-primary" : "text-dark"}`}
+                    className={`nav-link fw-medium ${isActive(item) ? "text-primary border-bottom border-2 border-primary" : "text-black"}`}
                   >
                     {item.name}
                   </Link>
@@ -103,10 +104,10 @@ const Header = () => {
             )}
             <li>
               <button
-                className="btn btn-primary px-3 d-flex align-items-center transition-hover"
+                className="btn btn-primary raibutton d-flex align-items-center transition-hover"
                 onClick={() => setShowLogin(true)}
               >
-                <LogIn size={18} className="me-1" /> Login
+              Login
               </button>
             </li>
           </ul>

@@ -1,0 +1,176 @@
+.rai-hero-home {
+  position: relative;
+  height: auto;
+  min-height: 86vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  overflow: hidden;
+  background: transparent;
+  padding: 0 20px;
+  padding-bottom: clamp(14px, 2vh, 24px);
+}
+.animated-bg {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 30%, #1c5ce3, #102b66);
+  animation: bgMove 10s infinite alternate ease-in-out;
+  z-index: 0;
+}
+#heroBars,
+#heroChart {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.25;
+  z-index: 1;
+  pointer-events: none;
+}
+.rai-hero-home .rai-hero-inner {
+  position: relative;
+  z-index: 2;
+}
+@keyframes bgMove {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-25%, -25%);
+  }
+}
+.rai-hero-home .sebi-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 5px;
+}
+.rai-hero-home .reg-number {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+.rai-hero-home h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 15px;
+}
+.rai-hero-home .subtext {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: #ffffff;
+  max-width: 750px;
+  margin: 0 auto 22px;
+}
+.rai-hero-home .subtext .line {
+  display: block;
+}
+.rai-hero-home .subtext .line.second {
+  margin-top: 12px;
+}
+@media (min-width: 992px) {
+  .rai-hero-home .subtext {
+    max-width: 1200px;
+  }
+  .rai-hero-home .subtext .line {
+    white-space: nowrap;
+  }
+}
+.hero-cta {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.btn-primary2,
+.btn-secondary2 {
+  display: inline-block;
+  padding: 14px 30px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  min-width: 180px;
+  text-align: center;
+}
+.btn-primary2 {
+  background: #ffffff;
+  color: #1c5ce3;
+}
+.btn-primary2:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  color: #1c5ce3;
+}
+.btn-secondary2 {
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  background: transparent;
+}
+.btn-secondary2:hover {
+  background: #ffffff;
+  color: #1c5ce3;
+}
+.trust-icons {
+  margin-top: 22px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+.trust-icons span {
+  color: #ffffff;
+}
+.trust-icons span::before {
+  content: "✔ ";
+  color: #00c853;
+  font-weight: 700;
+}
+@media (max-width: 768px) {
+  .rai-hero-home {
+    padding-top: calc(110px + env(safe-area-inset-top));
+    padding-bottom: 80px;
+    align-items: flex-start;
+    min-height: 110vh;
+    margin-bottom: 30px;
+  }
+  .rai-hero-home .sebi-title {
+    font-size: 1.3rem;
+  }
+  .rai-hero-home .reg-number {
+    font-size: 1.1rem;
+  }
+  .rai-hero-home h1 {
+    font-size: 1.7rem;
+  }
+  .rai-hero-home .subtext {
+    font-size: 0.98rem;
+    max-width: 100%;
+  }
+  .rai-hero-home .subtext .line {
+    white-space: normal;
+  }
+  .hero-cta {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .btn-primary,
+  .btn-secondary {
+    min-width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+  .trust-icons {
+    font-size: 0.95rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+}

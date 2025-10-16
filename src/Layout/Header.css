@@ -1,28 +1,9 @@
-.nav-link {
-  transition: all 0.3s ease;
-}
-
-.nav-link:hover {
-  color: #0d6efd; /* Bootstrap primary */
-}
-
-.dropdown-menu {
-  transition: all 0.3s ease;
-}
-
-.dropdown-item:hover {
-  background-color: rgba(13, 110, 253, 0.1);
-}
-
-.btn.transition-hover {
-  transition: all 0.3s ease;
-}
-
-.btn.transition-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-.hover-bg-primary:hover {
-  background-color: rgba(13, 110, 253, 0.05);
+.raibutton {
+  background-color: transparent;
+  border: 2px solid #bababa;
+  /* width: 100px; */
+  text-align: center;
+  color: black;
+  background-color: blue !important;
+  color: white;
 }

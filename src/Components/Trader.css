@@ -1,0 +1,75 @@
+/* Hero Section */
+.web-trader-hero {
+  height: 70vh;
+  background: radial-gradient(circle at 30% 30%, #1c5ce3, #102b66),
+    url("../assets/img1.jpg") center/cover no-repeat;
+  animation: fadeInBg 2s ease-in-out;
+   
+}
+
+@keyframes fadeInBg {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Card Styling */
+.web-trader-card {
+  background: #fff;
+  transition: all 0.4s ease;
+}
+
+.web-trader-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+}
+
+.card-image {
+  transition: transform 0.8s ease, opacity 0.5s ease;
+}
+
+.animate-card {
+  animation: fadeSlide 1s ease-in-out;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Section Animations */
+.web-trader-services {
+  animation: fadeInUp 0.8s ease-in-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+@media (max-width: 767px) {
+.slidersection{
+    margin-top: 20px;
+}
+.subscridbebuttton{
+    margin-left: 0 !important;
+}
+}

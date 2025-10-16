@@ -19,6 +19,9 @@ import TradeDiary from "./Userpanel/TradeDiary";
 import Footer from "./Layout/Footer";
 import About from "./Components/About";
 import ContactUs from "./Components/ContactUs";
+import Trader from "./Components/Trader";
+import Investor from "./Layout/Investor";
+import Ourplan from "./Components/Ourplan";
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -38,6 +41,9 @@ const AppWrapper = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/about" element={<About />} />
         <Route path="/contactUs" element={<ContactUs />} />
+        <Route path="/trader" element={<Trader />} />
+        <Route path="/investor" element={<Investor />} />
+        <Route path="/ourplan" element={<Ourplan />} />
 
         {/* Customer Panel */}
         <Route path="/customer/*" element={<MainLayout />}>
