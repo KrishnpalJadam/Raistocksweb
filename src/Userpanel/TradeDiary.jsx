@@ -17,7 +17,10 @@ import {
   addTradeLog,
   resetTradeForm,
 } from "../slices/userTradeFormSlice";
-import { addTradeDiaryEntry } from "../slices/tradeLogSlice";
+import {
+  addTradeDiaryEntry,
+  fetchTradeDiaryEntries,
+} from "../slices/tradeLogSlice";
 // For simplicity, we'll redefine a subset here. In a real app, this would be imported.
 // Will be replaced by trades from backend
 const DUMMY_TRADES = [
@@ -71,7 +74,7 @@ const TradeDiary = () => {
   useEffect(() => {
     if (user) {
       console.log("User object from Redux is available:", user);
-      console.log("User ID from Redux:", user._id);
+      console.log("User ID from Redux:", user?.data?.id);
     } else {
       console.log("User object from Redux is null or undefined.");
     }
@@ -79,8 +82,11 @@ const TradeDiary = () => {
 
   // Fetch backend trades and existing diary entries on mount
   useEffect(() => {
-    dispatch(fetchTrades());
-  }, [dispatch]);
+    if (user?.data?.id) {
+      dispatch(fetchTrades());
+dispatch(fetchTradeDiaryEntries(user?.data?.id));
+    }
+  }, [dispatch, user?.data?.id]);
 
   // Local state for matched trade and submitted entries
   const [matchedTrade, setMatchedTrade] = useState(null);
@@ -194,31 +200,6 @@ const TradeDiary = () => {
       mounted = false;
     };
   }, [trades, dispatch]);
-  const [log, setLog] = useState([
-    // Dummy logged trades for initial view
-    {
-      id: "L-001",
-      tradeTitle: DUMMY_TRADES[0].title,
-      action: DUMMY_TRADES[0].trade_action,
-      entry: 280.5,
-      exit: 436.0,
-      quantity: 30, // 2 lots
-      pnl: 4665.0,
-      result: "Profit",
-      date: "Oct 3, 2025",
-    },
-    {
-      id: "L-002",
-      tradeTitle: DUMMY_TRADES[5]?.title || "VBL",
-      action: DUMMY_TRADES[5]?.trade_action || "Buy",
-      entry: 485.0,
-      exit: 460.0,
-      quantity: 100,
-      pnl: -2500.0,
-      result: "Loss",
-      date: "Sep 27, 2025",
-    },
-  ]);
 
   // Function to handle form submission and P&L calculation
   // submit handler: find partial match, ensure exit action exists, calculate pnl and persist
@@ -301,10 +282,13 @@ const TradeDiary = () => {
     // --- DEBUGGING ---
     // Log the user object and the derived ID right before the check.
     console.log("Inside handleSubmit, user object is:", user);
-    console.log("Inside handleSubmit, attempting to get user._id:", user?._id);
+    console.log(
+      "Inside handleSubmit, attempting to get user._id:",
+      user?.data?.id
+    );
 
     // Get the user ID directly from the Redux state.
-    const currentUserId = user?._id;
+    const currentUserId = user?.data?.id;
 
     if (!currentUserId) {
       alert("Please log in to save trade logs.");
@@ -320,9 +304,16 @@ const TradeDiary = () => {
     const newLogEntry = {
       // keep a local id until backend responds
       id: `L-${Date.now()}`,
-      user_id: currentUserId,
       trade_id: found?._id ?? found?.id ?? null,
-      tradeTitle: selectedTrade.title || selectedTrade.trade_title || "",
+      user_id: currentUserId, // Fallback to selectedTrade's ID if no match is found
+      trade_id:
+        found?._id ??
+        found?.id ??
+        selectedTrade?._id ??
+        selectedTrade?.id ??
+        null,
+      tradeTitle:
+        found?.on || selectedTrade.title || selectedTrade.trade_title || "",
       matchedTradeId: found?._id ?? found?.id ?? null,
       matchedTradeTitle: found?.title || found?.trade_title || null,
       action: selectedTrade.trade_action || selectedTrade.action || "",
@@ -340,9 +331,6 @@ const TradeDiary = () => {
       }),
       createdAt: new Date().toISOString(),
     };
-
-    // Optimistic UI update
-    setLog((prev) => [newLogEntry, ...prev]);
 
     // persist to backend using tradeLogSlice thunk
     try {
@@ -565,8 +553,8 @@ const TradeDiary = () => {
                 <p className="small text-success mb-1 fw-bold">Total Profit</p>
                 <h4 className="text-success mb-0">
                   ₹
-                  {log
-                    .filter((l) => l.result === "Profit")
+                  {diaryLogs
+                    .filter((l) => l.pnl >= 0)
                     .reduce((sum, l) => sum + l.pnl, 0)
                     .toLocaleString()}
                 </h4>
@@ -576,8 +564,8 @@ const TradeDiary = () => {
                 <h4 className="text-danger mb-0">
                   ₹
                   {Math.abs(
-                    log
-                      .filter((l) => l.result === "Loss")
+                    diaryLogs
+                      .filter((l) => l.pnl < 0)
                       .reduce((sum, l) => sum + l.pnl, 0)
                   ).toLocaleString()}
                 </h4>
@@ -602,7 +590,7 @@ const TradeDiary = () => {
 
       {/* --- 3. P&L Log Table --- */}
       <h5 className="mb-3 mt-4 text-primary">
-        Trade Log ({log.length} Entries)
+        Trade Log ({diaryLogs.length} Entries)
       </h5>
       <div className="table-responsive rai-card card shadow-sm p-3">
         <table className="table table-striped table-hover mb-0 small">
@@ -622,27 +610,26 @@ const TradeDiary = () => {
           </thead>
 
           <tbody>
-            {log.map((entry, index) => (
+            {diaryLogs.map((entry, index) => (
               <tr key={entry.id}>
                 <td>{entry.date}</td>
                 <td className="fw-bold">
-                  {entry.tradeTitle}
-                  {entry.matchedTradeId && (
-                    <small className="d-block text-muted">
-                      Matched: {entry.matchedTradeTitle}
-                    </small>
-                  )}
+                  {entry.trade_title || entry.tradeTitle}
                 </td>
                 <td>
                   <span
                     className={`badge ${
-                      entry.action.toLowerCase().includes("buy") ||
-                      entry.action.toLowerCase().includes("long")
+                      (entry.action || entry.trade_action || "")
+                        .toLowerCase()
+                        .includes("buy") ||
+                      (entry.action || entry.trade_action || "")
+                        .toLowerCase()
+                        .includes("long")
                         ? "bg-success"
                         : "bg-danger"
                     }`}
                   >
-                    {entry.action}
+                    {entry.action || entry.trade_action}
                   </span>
                 </td>
                 <td>
@@ -661,13 +648,13 @@ const TradeDiary = () => {
                 <td>
                   {entry.exit != null ? Number(entry.exit).toFixed(2) : "-"}
                 </td>
-                <td>{entry.quantity}</td>
+                <td>{entry.quantity ?? 0}</td>
                 <td
                   className={`fw-bold ${
                     entry.result === "Profit" ? "text-success" : "text-danger"
                   }`}
                 >
-                  {entry.pnl.toLocaleString()}
+                  {(entry.pnl ?? 0).toLocaleString()}
                 </td>
                 <td>
                   <span
@@ -690,8 +677,23 @@ const TradeDiary = () => {
               <td colSpan="7" className="text-end fw-bold">
                 Total:
               </td>
-              <td className="fw-bold">120</td> {/* total qty */}
-              <td className="fw-bold text-success">+ ₹25,450</td>{" "}
+              <td className="fw-bold">
+                {diaryLogs.reduce((sum, l) => sum + l.quantity, 0)}
+              </td>
+              <td
+                className={`fw-bold ${
+                  diaryLogs.reduce((sum, l) => sum + l.pnl, 0) >= 0
+                    ? "text-success"
+                    : "text-danger"
+                }`}
+              >
+                {diaryLogs
+                  .reduce((sum, l) => sum + l.pnl, 0)
+                  .toLocaleString("en-IN", {
+                    style: "currency",
+                    currency: "INR",
+                  })}
+              </td>
               {/* total pnl */}
               <td></td>
             </tr>
