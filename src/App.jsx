@@ -1,3 +1,9 @@
+
+
+
+
+
+
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import "./App.css";
@@ -24,6 +30,7 @@ import Trader from "./Components/Trader";
 import Ourplan from "./Components/Ourplan";
 import { useEffect } from "react";
 import Investor from "./Components/Investor";
+import Profile from "./Userpanel/Profile";
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -64,6 +71,7 @@ const AppWrapper = () => {
           <Route path="research-report" element={<ResearchReport />} />
           <Route path="model-portfolio" element={<ModelPortfolio />} />
           <Route path="trade-diary" element={<TradeDiary />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
 
       </Routes>
@@ -82,3 +90,23 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

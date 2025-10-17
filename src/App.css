@@ -1,3 +1,5 @@
+
+
 /* Unique CSS for RAI */
 
 body {
@@ -1045,6 +1047,16 @@ a {
   .web-contact-form-box {
     padding: 1.5rem;
   }
+  .profilecc{
+    flex-direction: column;
+  }
+  .mainoutlet{
+    padding: 0 !important;
+  }
+  .colorbox{
+    flex-direction: column;
+    margin-left: auto;
+  }
 }
 
 
@@ -1313,3 +1325,40 @@ a {
             }
           }
     
+
+          .profile-card {
+  border-radius: 12px;
+}
+
+.profile-avatar {
+  width: 60px;
+  height: 60px;
+  font-size: 1.5rem;
+}
+
+
+.market-meter-section {
+  font-family: 'Poppins', sans-serif;
+}
+
+.market-meter-box {
+  background: #fff;
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
+}
+
+.market-meter-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.market-meter-gauge canvas {
+  width: 100% !important;
+  height: auto !important;
+}
+
+.market-meter-gauge h5 {
+  font-weight: 600;
+  color: #006400;
+}
+
