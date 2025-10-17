@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
 import { Check } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import SubscribeModal from './SubscribeModal';
+import { useLocation } from 'react-router-dom';
 
 // --- Investor Plans ---
 const investorPlans = [
@@ -9,7 +10,6 @@ const investorPlans = [
     title: 'Professional',
     duration: 'Monthly',
     price: '2,299',
-    oldPrice: '2,299',
     effectivePrice: '2,299',
     effectivePeriod: 'per month',
     isPopular: false,
@@ -30,7 +30,6 @@ const investorPlans = [
     title: 'Enterprise',
     duration: 'Quarterly',
     price: '4,999',
-    oldPrice: '7,497',
     effectivePrice: '1,667',
     effectivePeriod: ' per month',
     isPopular: true,
@@ -51,7 +50,6 @@ const investorPlans = [
     title: 'Ultimate',
     duration: 'Yearly',
     price: '12,999',
-    oldPrice: '27,588',
     effectivePrice: '1,084',
     effectivePeriod: 'per month',
     isPopular: false,
@@ -69,7 +67,7 @@ const investorPlans = [
   },
 ];
 
-// --- Trader Plans (price changed only) ---
+// --- Trader Plans ---
 const traderPlans = [
   {
     id: 1,
@@ -133,8 +131,29 @@ const traderPlans = [
   },
 ];
 
+// --- Trial Plan (hidden by default) ---
+const trialPlan = [
+  {
+    id: 1,
+    duration: '15 Days',
+    price: '999',
+    isPopular: false,
+    buttonClass: 'btn-primary',
+    features: [
+      'Everything in Standard +',
+      'Blueprint',
+      'GPQ',
+      'Sales Signals',
+      'Inventory management',
+      'Webhooks',
+      'Assignment rules',
+      'Validation rules',
+    ],
+  },
+];
+
 // --- Pricing Card Component ---
-const PricingCard = ({  plan, onSubscribe  }) => (
+const PricingCard = ({ plan, onSubscribe }) => (
   <div className={`pricing-card-container ${plan.isPopular ? 'popular-card' : ''}`}>
     {plan.isPopular && <div className="popular-tag">MOST POPULAR</div>}
 
@@ -148,10 +167,13 @@ const PricingCard = ({  plan, onSubscribe  }) => (
         {plan.price}
       </div>
       <p className="price-gst">(including GST)</p>
-      <p className="effective-price">
-        <span className="text-sm">₹</span>
-        {plan.effectivePrice} {plan.effectivePeriod}
-      </p>
+     {plan.effectivePrice && (
+  <p className="effective-price">
+    <span className="text-sm">₹</span>
+    {plan.effectivePrice} {plan.effectivePeriod}
+  </p>
+)}
+
     </div>
 
     <div className="card-cta-group">
@@ -161,7 +183,6 @@ const PricingCard = ({  plan, onSubscribe  }) => (
       >
         Subscribe Now
       </button>
-
     </div>
 
     <div className="card-features">
@@ -179,11 +200,25 @@ const PricingCard = ({  plan, onSubscribe  }) => (
 
 // --- Main Component ---
 const Ourplan = () => {
+  const location = useLocation();
   const [activeSegment, setActiveSegment] = useState('Investor');
+  const [showTrialOnly, setShowTrialOnly] = useState(false);
 
-  // dynamically choose plan set
-  const currentPlans = activeSegment === 'Trader' ? traderPlans : investorPlans;
-  // Inside your Ourplan component
+  useEffect(() => {
+    // 🔹 If navigated from Start Trial button
+    if (location.state?.showTrial) {
+      setActiveSegment('Trial');
+      setShowTrialOnly(true);
+    }
+  }, [location.state]);
+
+  const currentPlans =
+    activeSegment === 'Trader'
+      ? traderPlans
+      : activeSegment === 'Trial'
+      ? trialPlan
+      : investorPlans;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSubscribeClick = () => {
@@ -191,41 +226,52 @@ const Ourplan = () => {
   };
 
   const handleModalSubmit = (data) => {
-    console.log("User Data:", data);
+    console.log('User Data:', data);
     setIsModalOpen(false);
-    // Here you can redirect to payment or call API
   };
+
   return (
-    <div className="ourplan-wrapper">
+    <div className={`ourplan-wrapper ${showTrialOnly ? 'trial-mode' : ''}`}>
       <div className="content-container p-5">
-        {/* Segment Switch */}
-        <div className="segment-switch-group p-3">
-          <div className="segment-switch">
-            <button
-              onClick={() => setActiveSegment('Trader')}
-              className={`segment-button ${activeSegment === 'Trader' ? 'active' : ''}`}
-            >
-              Trader
-            </button>
-            <button
-              onClick={() => setActiveSegment('Investor')}
-              className={`segment-button ms-3 ${activeSegment === 'Investor' ? 'active' : ''}`}
-            >
-              Investor
-            </button>
+
+        {/* 🔹 Hide the switch when showing only Trial */}
+        {!showTrialOnly && (
+          <div className="segment-switch-group p-3">
+            <div className="segment-switch">
+              <button
+                onClick={() => setActiveSegment('Trader')}
+                className={`segment-button ${activeSegment === 'Trader' ? 'active' : ''}`}
+              >
+                Trader
+              </button>
+              <button
+                onClick={() => setActiveSegment('Investor')}
+                className={`segment-button ms-3 ${activeSegment === 'Investor' ? 'active' : ''}`}
+              >
+                Investor
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Pricing Cards */}
-        <div className="pricing-grid">
+        <div
+          className="pricing-grid"
+          style={
+            showTrialOnly
+              ? { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '70vh' }
+              : {}
+          }
+        >
           {currentPlans.map((plan) => (
             <PricingCard
               key={plan.id}
               plan={plan}
-              onSubscribe={() => handleSubscribeClick()}
+              onSubscribe={handleSubscribeClick}
             />
           ))}
         </div>
+
         <SubscribeModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}

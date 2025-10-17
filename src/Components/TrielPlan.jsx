@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from "react";
-import "./TrielPlan.css"; // We'll keep CSS in a separate file
-
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import "./TrielPlan.css"
 const TrielPlan = () => {
   const canvasRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -10,7 +11,7 @@ const TrielPlan = () => {
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
-      canvas.height = 320;
+      canvas.height = 560;
     };
 
     resizeCanvas();
@@ -35,17 +36,22 @@ const TrielPlan = () => {
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
 
+  // 🔹 Navigate to Ourplan page with "Trial" mode
+  const handleStartTrial = () => {
+    navigate("/ourplan", { state: { showTrial: true } });
+  };
+
   return (
     <section className="rai-final-cta">
-      {/* Background Bar Animation */}
       <div className="rai-background">
         <canvas ref={canvasRef}></canvas>
       </div>
 
-      {/* CTA Content */}
       <div className="rai-final-content">
         <p className="subheading">Try Before You Commit</p>
-        <h2 className="text-white fw-bold" style={{fontSize: "2.6rem"}}>15-Day Trial @ ₹999 – Proof Over Promises</h2>
+        <h2 className="text-white fw-bold" style={{ fontSize: "2.6rem" }}>
+          15-Day Trial @ ₹999 – Proof Over Promises
+        </h2>
         <p className="details">In these 15 days, you will get:</p>
         <ul className="trial-features">
           <li>11 trading days.</li>
@@ -54,9 +60,9 @@ const TrielPlan = () => {
           <li>No hidden charges. No upsells. No BS.</li>
           <li>Dashboard to check results.</li>
         </ul>
-        <a href="#trial-form" className="rai-final-btn">
+        <button onClick={handleStartTrial} className="rai-final-btn">
           Start Trial
-        </a>
+        </button>
       </div>
     </section>
   );
