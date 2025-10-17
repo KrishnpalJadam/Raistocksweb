@@ -1,3 +1,7 @@
+
+
+
+
 import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 
@@ -89,7 +93,7 @@ const MainLayout = () => {
           className={`${screenSize === 'desktop' && sidebarVisible ? "col-md-9 col-lg-10  darkmodd" : "col-12"
             } bg-light`}
         >
-          <div className="p-4">
+          <div className="p-4 mainoutlet">
             <Outlet />
           </div>
         </div>
@@ -122,3 +126,19 @@ const MainLayout = () => {
 };
 
 export default MainLayout;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

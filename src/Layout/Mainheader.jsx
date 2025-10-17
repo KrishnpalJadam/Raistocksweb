@@ -1,3 +1,7 @@
+
+
+
+
 // Header.jsx
 import React, { useState } from 'react';
 import { Bell, User, Menu, X, LineChart } from 'lucide-react';
@@ -41,10 +45,61 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <Link to="/customer/trade-recommendation" className="btn btn-primary btn-sm d-flex align-items-center rounded-3 me-2" title="Trade Recommendations">
-          📩
-        </Link>
+       
+  <div className="dropdown me-2" style={{ position: "relative" }}>
+    <button
+      className="btn btn-primary btn-sm d-flex align-items-center rounded-3 dropdown-toggle"
+      type="button"
+      id="tradeDropdown"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+    >
+      📩
+    </button>
+    <span
+      className="badge bg-danger rounded-pill"
+      style={{
+        fontSize: 10,
+        position: "absolute",
+        top: -6,
+        right: -6,
+      }}
+    >
+      3
+    </span>
 
+    <ul
+      className="dropdown-menu dropdown-menu-end shadow-sm"
+      aria-labelledby="tradeDropdown"
+      style={{ fontSize: "0.9rem", minWidth: "230px" }}
+    >
+      <li className="dropdown-header fw-bold">Recent Trade</li>
+      <li>
+        <span className="dropdown-item text-wrap">
+          🔹Long Banklify at ₹233
+        </span>
+        <div className='dropdown-item text-wrap ml-3'>
+          <p className='ml-3'>Entry Price : <span className='text-muted'>233</span></p>
+        </div>
+        
+      </li>
+      <li>
+        <span className="dropdown-item text-wrap">
+          🔹 New signal posted in Nifty section.
+        </span>
+          <div className='dropdown-item text-wrap ml-3'>
+          <p className='ml-3'>Entry Price : <span className='text-muted'>233</span></p>
+        </div>
+      </li>
+    
+      <li><hr className="dropdown-divider" /></li>
+      <li>
+        <Link to="/customer/trade-recommendation" className="dropdown-item text-center text-primary fw-semibold" href="#">
+          View all
+        </Link>
+      </li>
+    </ul>
+  </div>
       <div className="d-flex align-items-center">
   {/* 🔔 Notification dropdown */}
   <div className="dropdown me-2" style={{ position: "relative" }}>
@@ -117,9 +172,9 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
       style={{ fontSize: "0.9rem", minWidth: "180px" }}
     >
       <li>
-        <a className="dropdown-item d-flex align-items-center" href="#">
+        <Link to="/customer/profile" className="dropdown-item d-flex align-items-center" href="#">
           <i className="bi bi-person me-2"></i> Profile
-        </a>
+        </Link>
       </li>
       <li>
         <Link to="/" className="dropdown-item d-flex align-items-center text-danger" href="#">
@@ -144,3 +199,24 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
 };
 
 export default Mainheader;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
