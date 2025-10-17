@@ -32,8 +32,12 @@ export const loginCRMUser = createAsyncThunk(
       const response = await axios.post(`${API_URL}/login`, credentials);
       const data = response.data;
 
-      localStorage.setItem("crmUser", JSON.stringify(data));
-      return data;
+      // The actual user object is likely nested under a 'user' property.
+      if (data && data.user) {
+        localStorage.setItem("crmUser", JSON.stringify(data.user));
+        return data.user; // Return only the user object
+      }
+      return rejectWithValue("Invalid response from server");
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
     }
@@ -51,6 +55,7 @@ const crmAuthSlice = createSlice({
   name: "crmAuth",
   initialState: {
     user:
+      // The stored item is now the user object directly.
       typeof window !== "undefined"
         ? JSON.parse(localStorage.getItem("crmUser")) || null
         : null,
@@ -81,7 +86,7 @@ const crmAuthSlice = createSlice({
       })
       .addCase(loginCRMUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload; // payload is now the user object
       })
       .addCase(loginCRMUser.rejected, (state, action) => {
         state.loading = false;

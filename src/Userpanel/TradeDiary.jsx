@@ -70,12 +70,7 @@ const TradeDiary = () => {
   // Debug log for auth state
   useEffect(() => {
     if (!user) {
-      // Check if user exists in localStorage as a fallback
-      const storedUser = localStorage.getItem("crmUser");
-      console.log(
-        "No user in Redux state. LocalStorage user:",
-        storedUser ? JSON.parse(storedUser) : null
-      );
+      console.log("No user in Redux state.");
     } else {
       console.log("User authenticated:", user._id);
     }
@@ -294,20 +289,9 @@ const TradeDiary = () => {
     const pnl = parseFloat(rawPnl.toFixed(2));
     const result = pnl >= 0 ? "Profit" : "Loss";
 
-    // determine current user id (redux or localStorage fallback)
-    // determine current user id (redux, fallback to localStorage)
-    // Or it could be the user object directly.
-    let currentUserId = user?._id || user?.user?._id;
+    // Get the user ID directly from the Redux state.
+    const currentUserId = user?._id;
 
-    if (!currentUserId) {
-      const storedUser = localStorage.getItem("crmUser");
-      if (storedUser) {
-        try {
-          const parsed = JSON.parse(storedUser);
-          // The stored user might also be nest || parsed?.user?._id;
-        } catch {}
-      }
-    }
     if (!currentUserId) {
       alert("Please log in to save trade logs.");
       return;
