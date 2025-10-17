@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 
 // --- Investor Plans ---
 const investorPlans = [
+
   {
     id: 1,
     title: 'Professional',
@@ -15,16 +16,25 @@ const investorPlans = [
     isPopular: false,
     buttonClass: 'btn-primary',
     features: [
-      'Everything in Standard +',
-      'Blueprint',
-      'GPQ',
-      'Sales Signals',
-      'Inventory management',
-      'Webhooks',
-      'Assignment rules',
-      'Validation rules',
+      
+      '1-4* actionable ideas every market week',
+      'Swing Trades – Hold for weeks to months with precise entry/exit logic',
+      'Investment Ideas – Long-term picks with strong fundamentals',
+      'F&O for portfolio hedging (Minimum 8 calls per month)',
     ],
+    services: [
+      'Delivered via WhatsApp for faster execution',
+      'Personal Dashboard',
+      'Real-time tracking of all active and closed trades',
+      'Access to performance reports and allocation summaries',
+      'A personalized Trade Diary to record and review each idea',
+      'All your trades are trackable, ensuring full transparency and control',
+      'Monthly performance report',
+    ],
+   
   },
+
+
   {
     id: 2,
     title: 'Enterprise',
@@ -35,15 +45,22 @@ const investorPlans = [
     isPopular: true,
     buttonClass: 'btn-popular',
     features: [
-      'Everything in Professional +',
-      'Zia — AI assistant',
-      'Territory management',
-      'Custom functions',
-      'Journey orchestration',
-      'Multi-user portals',
-      'Page layouts',
-      'Client scripts',
+      
+      '1-4* actionable ideas every market week',
+      'Swing Trades – Hold for weeks to months with precise entry/exit logic',
+      'Investment Ideas – Long-term picks with strong fundamentals',
+      'F&O for portfolio hedging (Minimum 8 calls per month)',
     ],
+    services: [
+      'Delivered via WhatsApp for faster execution',
+      'Personal Dashboard',
+      'Real-time tracking of all active and closed trades',
+      'Access to performance reports and allocation summaries',
+      'A personalized Trade Diary to record and review each idea',
+      'All your trades are trackable, ensuring full transparency and control',
+      'Monthly performance report',
+    ],
+   
   },
   {
     id: 3,
@@ -55,14 +72,24 @@ const investorPlans = [
     isPopular: false,
     buttonClass: 'btn-primary',
     features: [
-      'Everything in Enterprise +',
-      'Enhanced feature limits',
-      'Custom AI/ML platform',
-      'Advanced customization',
-      'Data preparation',
-      'Augmented analytics',
-      'Data storytelling',
-      'Unified business insights',
+     
+      '1-4* actionable ideas every market week',
+      'Swing Trades – Hold for weeks to months with precise entry/exit logic',
+      'Investment Ideas – Long-term picks with strong fundamentals',
+      'F&O for portfolio hedging (Minimum 8 calls per month)',
+    ],
+    services: [
+      'Delivered via WhatsApp for faster execution',
+      'Personal Dashboard',
+      'Real-time tracking of all active and closed trades',
+      'Access to performance reports and allocation summaries',
+      'A personalized Trade Diary to record and review each idea',
+      'All your trades are trackable, ensuring full transparency and control',
+      'Monthly performance report',
+    ],
+    yearlyBenefits: [
+      'Research Recommendation',
+      'Model portfolio',
     ],
   },
 ];
@@ -79,14 +106,26 @@ const traderPlans = [
     isPopular: false,
     buttonClass: 'btn-primary',
     features: [
-      'Everything in Standard +',
-      'Blueprint',
-      'GPQ',
-      'Sales Signals',
-      'Inventory management',
-      'Webhooks',
-      'Assignment rules',
-      'Validation rules',
+      '1 – 4 actionable ideas every market day*',
+      'Scalp Trades – Quickfire momentum opportunities',
+      'Intraday Trades – Precision-based daily setups',
+      'Swing Trades – Hold for days/weeks with defined risk levels',
+      'Investment Ideas – Long-term fundamental picks',
+      'Strategic Positions – Based on macro & sentiment analysis',
+      'Income-Generating Ideas – Designed for passive returns (Minimum 24 calls per month)',
+    ],
+    services: [
+      'Delivered via WhatsApp for faster execution',
+      'Personal Dashboard',
+      'Real-time tracking of all active and closed trades',
+      'Access to performance reports and allocation summaries',
+      'A personalized Trade Diary to record and review each idea',
+      'All your trades are trackable, ensuring full transparency and control',
+      'Monthly performance report',
+    ],
+    yearlyBenefits: [
+      'Research Recommendation',
+      'Model portfolio',
     ],
   },
   {
@@ -99,14 +138,26 @@ const traderPlans = [
     isPopular: true,
     buttonClass: 'btn-popular',
     features: [
-      'Everything in Professional +',
-      'Zia — AI assistant',
-      'Territory management',
-      'Custom functions',
-      'Journey orchestration',
-      'Multi-user portals',
-      'Page layouts',
-      'Client scripts',
+      '1 – 4 actionable ideas every market day*',
+      'Scalp Trades – Quickfire momentum opportunities',
+      'Intraday Trades – Precision-based daily setups',
+      'Swing Trades – Hold for days/weeks with defined risk levels',
+      'Investment Ideas – Long-term fundamental picks',
+      'Strategic Positions – Based on macro & sentiment analysis',
+      'Income-Generating Ideas – Designed for passive returns (Minimum 24 calls per month)',
+    ],
+    services: [
+      'Delivered via WhatsApp for faster execution',
+      'Personal Dashboard',
+      'Real-time tracking of all active and closed trades',
+      'Access to performance reports and allocation summaries',
+      'A personalized Trade Diary to record and review each idea',
+      'All your trades are trackable, ensuring full transparency and control',
+      'Monthly performance report',
+    ],
+    yearlyBenefits: [
+      'Research Recommendation',
+      'Model portfolio',
     ],
   },
   {
@@ -119,14 +170,26 @@ const traderPlans = [
     isPopular: false,
     buttonClass: 'btn-primary',
     features: [
-      'Everything in Enterprise +',
-      'Enhanced feature limits',
-      'Custom AI/ML platform',
-      'Advanced customization',
-      'Data preparation',
-      'Augmented analytics',
-      'Data storytelling',
-      'Unified business insights',
+      '1 – 4 actionable ideas every market day*',
+      'Scalp Trades – Quickfire momentum opportunities',
+      'Intraday Trades – Precision-based daily setups',
+      'Swing Trades – Hold for days/weeks with defined risk levels',
+      'Investment Ideas – Long-term fundamental picks',
+      'Strategic Positions – Based on macro & sentiment analysis',
+      'Income-Generating Ideas – Designed for passive returns (Minimum 24 calls per month)',
+    ],
+    services: [
+      'Delivered via WhatsApp for faster execution',
+      'Personal Dashboard',
+      'Real-time tracking of all active and closed trades',
+      'Access to performance reports and allocation summaries',
+      'A personalized Trade Diary to record and review each idea',
+      'All your trades are trackable, ensuring full transparency and control',
+      'Monthly performance report',
+    ],
+    yearlyBenefits: [
+      'Research Recommendation',
+      'Model portfolio',
     ],
   },
 ];
@@ -135,22 +198,36 @@ const traderPlans = [
 const trialPlan = [
   {
     id: 1,
-    duration: '15 Days',
-    price: '999',
+    duration: "15 Days",
+    price: "999",
     isPopular: false,
-    buttonClass: 'btn-primary',
+    buttonClass: "btn-primary",
     features: [
-      'Everything in Standard +',
-      'Blueprint',
-      'GPQ',
-      'Sales Signals',
-      'Inventory management',
-      'Webhooks',
-      'Assignment rules',
-      'Validation rules',
+      // --- Features ---
+      "1 – 4 actionable ideas every market day*",
+      "Scalp Trades – Quickfire momentum opportunities",
+      "Intraday Trades – Precision-based daily setups",
+      "Swing Trades – Hold for days/weeks with defined risk levels",
+      "Investment Ideas – Long-term fundamental picks",
+      "Strategic Positions – Based on macro & sentiment analysis",
+      "Income-Generating Ideas – Designed for passive returns",
+
+
     ],
+    services: [
+      // --- Services ---
+      "Delivered via WhatsApp for faster execution",
+      "Personal Dashboard access",
+      "Real-time tracking of all active and closed trades",
+      "Performance reports and allocation summaries",
+      "Personalized Trade Diary to record and review each idea",
+      "All trades are trackable ensuring full transparency and control",
+      "End-of-trial performance report",
+    ]
+
   },
 ];
+
 
 // --- Pricing Card Component ---
 const PricingCard = ({ plan, onSubscribe }) => (
@@ -167,12 +244,12 @@ const PricingCard = ({ plan, onSubscribe }) => (
         {plan.price}
       </div>
       <p className="price-gst">(including GST)</p>
-     {plan.effectivePrice && (
-  <p className="effective-price">
-    <span className="text-sm">₹</span>
-    {plan.effectivePrice} {plan.effectivePeriod}
-  </p>
-)}
+      {plan.effectivePrice && (
+        <p className="effective-price">
+          <span className="text-sm">₹</span>
+          {plan.effectivePrice} {plan.effectivePeriod}
+        </p>
+      )}
 
     </div>
 
@@ -186,14 +263,29 @@ const PricingCard = ({ plan, onSubscribe }) => (
     </div>
 
     <div className="card-features">
-      <ul className="feature-list">
-        {plan.features.map((feature, index) => (
-          <li key={index} className="feature-item">
+      <span className='fw-bold fs-5'>Fetures</span>
+      <ul className="feature-list mb-3">
+        {plan.features?.map((feature, index) => (
+          <li key={index} className="feature-item ">
             <Check className="feature-icon" />
             <span>{feature}</span>
           </li>
         ))}
       </ul>
+      {/* ✅ Render Services only if available */}
+      {plan.services && (
+        <>
+          <span className="fw-bold fs-5 ">Services</span>
+          <ul className="feature-list mt-3">
+            {plan.services.map((service, index) => (
+              <li key={index} className="feature-item">
+                <Check className="feature-icon" />
+                <span>{service}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   </div>
 );
@@ -216,8 +308,8 @@ const Ourplan = () => {
     activeSegment === 'Trader'
       ? traderPlans
       : activeSegment === 'Trial'
-      ? trialPlan
-      : investorPlans;
+        ? trialPlan
+        : investorPlans;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
