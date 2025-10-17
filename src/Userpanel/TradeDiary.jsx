@@ -68,7 +68,7 @@ const TradeDiary = () => {
   );
   const { actions: tradeActions } = useSelector((state) => state.tradeActions);
   const { user, loading: authLoading } = useSelector((state) => state.crmAuth);
-  const diaryLogs = useSelector((state) => state.tradeLogs?.logs || []);
+const diaryLogs = useSelector((state) => state.tradeLogs?.logs?.trades || []);
 
   // Add a debug log to see when the user object is available from Redux
   useEffect(() => {
@@ -609,95 +609,78 @@ dispatch(fetchTradeDiaryEntries(user?.data?.id));
             </tr>
           </thead>
 
-          <tbody>
-            {diaryLogs.map((entry, index) => (
-              <tr key={entry.id}>
-                <td>{entry.date}</td>
-                <td className="fw-bold">
-                  {entry.trade_title || entry.tradeTitle}
-                </td>
-                <td>
-                  <span
-                    className={`badge ${
-                      (entry.action || entry.trade_action || "")
-                        .toLowerCase()
-                        .includes("buy") ||
-                      (entry.action || entry.trade_action || "")
-                        .toLowerCase()
-                        .includes("long")
-                        ? "bg-success"
-                        : "bg-danger"
-                    }`}
-                  >
-                    {entry.action || entry.trade_action}
-                  </span>
-                </td>
-                <td>
-                  {entry.recommendedEntry
-                    ? Number(entry.recommendedEntry).toFixed(2)
-                    : "-"}
-                </td>
-                <td>
-                  {entry.entry != null ? Number(entry.entry).toFixed(2) : "-"}
-                </td>
-                <td>
-                  {entry.recommendedExit
-                    ? Number(entry.recommendedExit).toFixed(2)
-                    : "-"}
-                </td>
-                <td>
-                  {entry.exit != null ? Number(entry.exit).toFixed(2) : "-"}
-                </td>
-                <td>{entry.quantity ?? 0}</td>
-                <td
-                  className={`fw-bold ${
-                    entry.result === "Profit" ? "text-success" : "text-danger"
-                  }`}
-                >
-                  {(entry.pnl ?? 0).toLocaleString()}
-                </td>
-                <td>
-                  <span
-                    className={`badge ${
-                      entry.result === "Profit"
-                        ? "bg-success-subtle text-success"
-                        : "bg-danger-subtle text-danger"
-                    }`}
-                  >
-                    {entry.result}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+  <tbody>
+  {Array.isArray(diaryLogs) &&
+    diaryLogs.map((entry, index) => {
+      const recommendedEntry = Number(entry.recommendedEntry) || 0;
+      const entryPrice = Number(entry.entry) || 0;
+      const recommendedExit = Number(entry.recommendedExit) || 0;
+      const exitPrice = Number(entry.exit) || 0;
+      const quantity = Number(entry.quantity) || 0;
+      const pnl = Number(entry.pnl) || 0;
+
+      return (
+        <tr key={entry._id || entry.id || `entry-${index}`}>
+          <td>{new Date(entry.date).toLocaleDateString("en-US")}</td>
+          <td>{entry.tradeTitle || "-"}</td>
+          <td>{entry.action || "-"}</td>
+          <td>{recommendedEntry ? recommendedEntry.toFixed(2) : "-"}</td>
+          <td>{entryPrice ? entryPrice.toFixed(2) : "-"}</td>
+          <td>{recommendedExit ? recommendedExit.toFixed(2) : "-"}</td>
+          <td>{exitPrice ? exitPrice.toFixed(2) : "-"}</td>
+          <td>{quantity || 0}</td>
+          <td
+            className={`fw-bold ${
+              entry.result === "Profit" ? "text-success" : "text-danger"
+            }`}
+          >
+            {pnl.toLocaleString("en-IN", {
+              style: "currency",
+              currency: "INR",
+              minimumFractionDigits: 2,
+            })}
+          </td>
+          <td>{entry.result || "-"}</td>
+        </tr>
+      );
+    })}
+</tbody>
+
+
 
           {/* Footer for totals */}
-          <tfoot className="table-light">
-            <tr>
-              <td colSpan="7" className="text-end fw-bold">
-                Total:
-              </td>
-              <td className="fw-bold">
-                {diaryLogs.reduce((sum, l) => sum + l.quantity, 0)}
-              </td>
-              <td
-                className={`fw-bold ${
-                  diaryLogs.reduce((sum, l) => sum + l.pnl, 0) >= 0
-                    ? "text-success"
-                    : "text-danger"
-                }`}
-              >
-                {diaryLogs
-                  .reduce((sum, l) => sum + l.pnl, 0)
-                  .toLocaleString("en-IN", {
-                    style: "currency",
-                    currency: "INR",
-                  })}
-              </td>
-              {/* total pnl */}
-              <td></td>
-            </tr>
-          </tfoot>
+      <tfoot className="table-light">
+  <tr>
+    <td colSpan="7" className="text-end fw-bold">Total:</td>
+
+    {/* Total Quantity */}
+    <td className="fw-bold">
+      {diaryLogs.reduce(
+        (sum, l) => sum + (Number(l.quantity) || 0),
+        0
+      )}
+    </td>
+
+    {/* Total PnL */}
+    <td
+      className={`fw-bold ${
+        diaryLogs.reduce((sum, l) => sum + (Number(l.pnl) || 0), 0) >= 0
+          ? "text-success"
+          : "text-danger"
+      }`}
+    >
+      {diaryLogs
+        .reduce((sum, l) => sum + (Number(l.pnl) || 0), 0)
+        .toLocaleString("en-IN", {
+          style: "currency",
+          currency: "INR",
+          minimumFractionDigits: 2,
+        })}
+    </td>
+
+    <td></td>
+  </tr>
+</tfoot>
         </table>
       </div>
     </div>

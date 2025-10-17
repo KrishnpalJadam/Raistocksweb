@@ -5,38 +5,56 @@ const API_URL = `${
   import.meta.env.VITE_API_URL || "http://localhost:5000"
 }/api/trade-diary`;
 
-// Fetch user's trade diary entries
+// ✅ 1. Fetch user's trade diary entries
 export const fetchTradeDiaryEntries = createAsyncThunk(
   "tradeLogs/fetchAll",
   async (userId, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${API_URL}/user/${userId}`);
-      // Ensure we always return an array
-      return Array.isArray(response.data) ? response.data : response.data.data || [];
+
+      // Backend often returns { success, data: [...] }
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || [];
+
+      console.log("Fetched diary logs from backend:", data);
+      return data;
     } catch (err) {
+      console.error("Fetch Trade Logs Error:", err.response?.data || err.message);
       return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-// Add new trade diary entry
+// ✅ 2. Add new trade diary entry
 export const addTradeDiaryEntry = createAsyncThunk(
   "tradeLogs/add",
-  async (entryData, { rejectWithValue }) => {
+  async (entryData, { getState, rejectWithValue }) => {
     try {
-      // Log the data being sent to the backend for debugging
-      console.log("Data being sent to /api/trade-diary:", entryData);
-      const response = await axios.post(API_URL, entryData);
-      return response.data;
+      const userId = getState().crmAuth.user?.data?.id;
+      if (!userId) throw new Error("User not logged in");
+
+      // ✅ Must send crmUser (not user_id)
+      const dataToSend = {
+        ...entryData,
+        crmUser: userId,
+      };
+
+      console.log("Sending new trade log to backend:", dataToSend);
+
+      const response = await axios.post(API_URL, dataToSend);
+      const newLog = response.data?.data || response.data;
+
+      console.log("New log saved on backend:", newLog);
+      return newLog;
     } catch (error) {
-      // Log the detailed error response from the backend
-      console.error("Backend Error:", error.response?.data || error.message);
-      return rejectWithValue(error.message);
+      console.error("Backend Error (Add Log):", error.response?.data || error.message);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
-// Update trade diary entry
+// ✅ 3. Update trade diary entry
 export const updateTradeDiaryEntry = createAsyncThunk(
   "tradeLogs/update",
   async ({ id, data }, { getState, rejectWithValue }) => {
@@ -44,42 +62,36 @@ export const updateTradeDiaryEntry = createAsyncThunk(
       const userId = getState().crmAuth.user?.data?.id;
       if (!userId) throw new Error("User not logged in");
 
-      const response = await axios.put(`${API_URL}/${id}`, {
-        ...data,
-        user_id: userId,
-      });
-      return response.data;
+      const updatedData = { ...data, crmUser: userId };
+      const response = await axios.put(`${API_URL}/${id}`, updatedData);
+      return response.data?.data || response.data;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
-// Delete trade diary entry
+// ✅ 4. Delete trade diary entry
 export const deleteTradeDiaryEntry = createAsyncThunk(
   "tradeLogs/delete",
-  async (id, { getState, rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
-      const userId = getState().crmAuth.user?.data?.id;
-      if (!userId) throw new Error("User not logged in");
-
       await axios.delete(`${API_URL}/${id}`);
       return id;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
 
-const initialState = {
-  logs: [],
-  loading: false,
-  error: null,
-};
-
+// ✅ 5. Slice setup
 const tradeLogSlice = createSlice({
   name: "tradeLogs",
-  initialState,
+  initialState: {
+    logs: [],
+    loading: false,
+    error: null,
+  },
   reducers: {
     clearError: (state) => {
       state.error = null;
@@ -87,73 +99,60 @@ const tradeLogSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch entries
+      // FETCH
       .addCase(fetchTradeDiaryEntries.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-  .addCase(fetchTradeDiaryEntries.fulfilled, (state, action) => {
-  state.loading = false;
-  const payload = action.payload;
-
-  // Ensure it's always an array
-  if (Array.isArray(payload)) {
-    state.logs = payload;
-  } else if (Array.isArray(payload.data)) {
-    state.logs = payload.data;
-  } else {
-    state.logs = []; // fallback
-  }
-})
+      .addCase(fetchTradeDiaryEntries.fulfilled, (state, action) => {
+        state.loading = false;
+        state.logs = Array.isArray(action.payload) ? action.payload : [];
+      })
       .addCase(fetchTradeDiaryEntries.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // Add entry
+      // ADD
       .addCase(addTradeDiaryEntry.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(addTradeDiaryEntry.fulfilled, (state, action) => {
         state.loading = false;
-        // The backend might return the new entry directly or nested in a 'data' property.
-        // This handles both cases.
-        const newLog = action.payload.data || action.payload;
-        // Add the new log to the beginning of the array
-        state.logs.unshift(newLog);
+        const newLog = action.payload;
+        if (newLog) state.logs.unshift(newLog);
       })
       .addCase(addTradeDiaryEntry.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // Update entry
+      // UPDATE
       .addCase(updateTradeDiaryEntry.fulfilled, (state, action) => {
-        const index = state.logs.findIndex(
-          (log) => log._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.logs[index] = action.payload;
-        }
+        const idx = state.logs.findIndex((log) => log._id === action.payload._id);
+        if (idx !== -1) state.logs[idx] = action.payload;
       })
 
-      // Delete entry
+      // DELETE
       .addCase(deleteTradeDiaryEntry.fulfilled, (state, action) => {
         state.logs = state.logs.filter((log) => log._id !== action.payload);
       });
   },
 });
 
-// Selectors
+// ✅ Selectors
 export const selectAllLogs = (state) => state.tradeLogs.logs;
+
 export const selectTotalProfit = (state) =>
   state.tradeLogs.logs
     .filter((log) => log.result === "Profit")
-    .reduce((sum, log) => sum + log.pnl, 0);
+    .reduce((sum, log) => sum + (Number(log.pnl) || 0), 0);
+
 export const selectTotalLoss = (state) =>
   state.tradeLogs.logs
     .filter((log) => log.result === "Loss")
-    .reduce((sum, log) => sum + log.pnl, 0);
+    .reduce((sum, log) => sum + (Number(log.pnl) || 0), 0);
 
+export const { clearError } = tradeLogSlice.actions;
 export default tradeLogSlice.reducer;
