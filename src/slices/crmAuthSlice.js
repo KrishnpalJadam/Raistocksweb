@@ -13,9 +13,18 @@ export const registerCRMUser = createAsyncThunk(
       const response = await axios.post(`${API_URL}/register`, userData);
       const data = response.data;
 
-      // store user in localStorage
-      localStorage.setItem("crmUser", JSON.stringify(data));
-      return data;
+      // The actual user object is likely nested under a 'user' property.
+      // Ensure this matches the structure in loginCRMUser.
+      if (data && data.user) {
+        localStorage.setItem("crmUser", JSON.stringify(data.user));
+        return data.user; // Return only the user object
+      // The actual user object is inside the 'data' property of the response.
+      // Let's return that and also save it to localStorage.
+      if (data && data.data) {
+        localStorage.setItem("crmUser", JSON.stringify(data.data));
+        return data.data; // Return only the user object
+      }
+      return rejectWithValue("Invalid response from server on registration");
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Registration failed"
@@ -36,6 +45,11 @@ export const loginCRMUser = createAsyncThunk(
       if (data && data.user) {
         localStorage.setItem("crmUser", JSON.stringify(data.user));
         return data.user; // Return only the user object
+      // The actual user object is inside the 'data' property of the response.
+      // Let's return that and also save it to localStorage.
+      if (data && data.data) {
+        localStorage.setItem("crmUser", JSON.stringify(data.data));
+        return data.data; // Return only the user object
       }
       return rejectWithValue("Invalid response from server");
     } catch (error) {

@@ -64,15 +64,16 @@ const TradeDiary = () => {
     (state) => state.trades
   );
   const { actions: tradeActions } = useSelector((state) => state.tradeActions);
-  const user = useSelector((state) => state.crmAuth.user);
+  const { user, loading: authLoading } = useSelector((state) => state.crmAuth);
   const diaryLogs = useSelector((state) => state.tradeLogs?.logs || []);
 
-  // Debug log for auth state
+  // Add a debug log to see when the user object is available from Redux
   useEffect(() => {
-    if (!user) {
-      console.log("No user in Redux state.");
+    if (user) {
+      console.log("User object from Redux is available:", user);
+      console.log("User ID from Redux:", user._id);
     } else {
-      console.log("User authenticated:", user._id);
+      console.log("User object from Redux is null or undefined.");
     }
   }, [user]);
 
@@ -229,6 +230,14 @@ const TradeDiary = () => {
       return;
     }
 
+    // If auth state is still resolving, prevent submission
+    if (authLoading) {
+      alert(
+        "Authentication is in progress. Please wait a moment and try again."
+      );
+      return;
+    }
+
     // find best match from backend trades by partial title match
     const selectedTitle = (
       selectedTrade.title ||
@@ -288,6 +297,11 @@ const TradeDiary = () => {
     const rawPnl = (exit - entry) * qty * multiplier;
     const pnl = parseFloat(rawPnl.toFixed(2));
     const result = pnl >= 0 ? "Profit" : "Loss";
+
+    // --- DEBUGGING ---
+    // Log the user object and the derived ID right before the check.
+    console.log("Inside handleSubmit, user object is:", user);
+    console.log("Inside handleSubmit, attempting to get user._id:", user?._id);
 
     // Get the user ID directly from the Redux state.
     const currentUserId = user?._id;

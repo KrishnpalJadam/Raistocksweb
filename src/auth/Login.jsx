@@ -38,17 +38,7 @@ const Login = ({ show, onClose }) => {
     }
 
     try {
-      const resultAction = await dispatch(loginCRMUser({ email, password }));
-      const originalPromiseResult = await resultAction.unwrap();
-
-      // Manually set the user object to localStorage to ensure it's correct.
-      // The payload from unwrap() might be what you need.
-      if (originalPromiseResult && originalPromiseResult.user) {
-        localStorage.setItem(
-          "crmUser",
-          JSON.stringify(originalPromiseResult.user)
-        );
-      }
+      await dispatch(loginCRMUser({ email, password })).unwrap();
     } catch (err) {
       toast.error(err || "Invalid credentials");
     }
