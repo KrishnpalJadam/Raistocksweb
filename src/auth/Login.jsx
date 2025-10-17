@@ -9,7 +9,7 @@ import { loginCRMUser } from "../slices/crmAuthSlice"; // adjust path
 const Login = ({ show, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -38,7 +38,17 @@ const Login = ({ show, onClose }) => {
     }
 
     try {
-      await dispatch(loginCRMUser({ email, password })).unwrap();
+      const resultAction = await dispatch(loginCRMUser({ email, password }));
+      const originalPromiseResult = await resultAction.unwrap();
+
+      // Manually set the user object to localStorage to ensure it's correct.
+      // The payload from unwrap() might be what you need.
+      if (originalPromiseResult && originalPromiseResult.user) {
+        localStorage.setItem(
+          "crmUser",
+          JSON.stringify(originalPromiseResult.user)
+        );
+      }
     } catch (err) {
       toast.error(err || "Invalid credentials");
     }
@@ -54,9 +64,12 @@ const Login = ({ show, onClose }) => {
             alt="Hand Mobile"
             className="img-fluid"
           />
-          <h4 className="mt-3 text-primary d-none">Redefine your investing experience</h4>
+          <h4 className="mt-3 text-primary d-none">
+            Redefine your investing experience
+          </h4>
           <p className="text-muted d-none">
-            Login to Raistocks and manage your trading smarter with actionable insights.
+            Login to Raistocks and manage your trading smarter with actionable
+            insights.
           </p>
         </div>
 
@@ -104,7 +117,8 @@ const Login = ({ show, onClose }) => {
           {error && <p className="text-danger small mt-2">{error}</p>}
 
           <p className="mt-3 small text-muted">
-            By logging in, you agree to our <a href="#terms">Terms & Conditions</a>
+            By logging in, you agree to our{" "}
+            <a href="#terms">Terms & Conditions</a>
           </p>
         </div>
       </div>

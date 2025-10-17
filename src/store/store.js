@@ -7,7 +7,8 @@ import tradeActionsReducer from "../slices/tradeActionsSlice";
 import marketTrendReducer from "../slices/marketTrendSlice";
 import tradeReducer from "../slices/tradeSlice";
 import researchReportReducer from "../slices/researchReportSlice";
-import userTradeFormReducer from "../slices/userTradeFormSlice"; // Import the new slice
+import userTradeFormReducer from "../slices/userTradeFormSlice";
+import tradeLogReducer from "../slices/tradeLogSlice";
 
 const store = configureStore({
   reducer: {
@@ -17,8 +18,9 @@ const store = configureStore({
     tradeActions: tradeActionsReducer,
     marketTrend: marketTrendReducer,
     trades: tradeReducer,
-    researchReports: researchReportReducer, 
-     userTradeForm: userTradeFormReducer, // Add this line
+    researchReports: researchReportReducer,
+    userTradeForm: userTradeFormReducer,
+    tradeLogs: tradeLogReducer,
   },
 });
 

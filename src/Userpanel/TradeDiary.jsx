@@ -1,23 +1,25 @@
 // TradeDiary.jsx
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import {
+  X,
   BookOpen,
   TrendingUp,
   TrendingDown,
   ClipboardCheck,
-  X,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { fetchTrades } from "../slices/tradeSlice";
+import { fetchTradeActions } from "../slices/tradeActionsSlice";
 import {
   setTradeFormField,
   setSelectedTrade,
   addTradeLog,
   resetTradeForm,
 } from "../slices/userTradeFormSlice";
-
-// NOTE: We'll reuse the DUMMY_TRADES list from the TradeRecommendation component
+import { addTradeDiaryEntry } from "../slices/tradeLogSlice";
 // For simplicity, we'll redefine a subset here. In a real app, this would be imported.
+// Will be replaced by trades from backend
 const DUMMY_TRADES = [
   {
     id: 1,
@@ -58,19 +60,144 @@ const TradeDiary = () => {
   const tradeForm = useSelector(
     (state) => state.userTradeForm?.tradeForm || {}
   );
+  const { trades, loading: tradesLoading } = useSelector(
+    (state) => state.trades
+  );
+  const { actions: tradeActions } = useSelector((state) => state.tradeActions);
+  const user = useSelector((state) => state.crmAuth.user);
+  const diaryLogs = useSelector((state) => state.tradeLogs?.logs || []);
+
+  // Debug log for auth state
+  useEffect(() => {
+    if (!user) {
+      // Check if user exists in localStorage as a fallback
+      const storedUser = localStorage.getItem("crmUser");
+      console.log(
+        "No user in Redux state. LocalStorage user:",
+        storedUser ? JSON.parse(storedUser) : null
+      );
+    } else {
+      console.log("User authenticated:", user._id);
+    }
+  }, [user]);
+
+  // Fetch backend trades and existing diary entries on mount
+  useEffect(() => {
+    dispatch(fetchTrades());
+  }, [dispatch]);
+
+  // Local state for matched trade and submitted entries
+  const [matchedTrade, setMatchedTrade] = useState(null);
+  const [submittedEntries, setSubmittedEntries] = useState([]);
+  const [tradesWithExit, setTradesWithExit] = useState([]);
+
+  // Helper function to check if trade has exit action and return it
+  const getTradeExitAction = (tradeId) => {
+    if (!tradeActions || !tradeActions.length) return null;
+    return tradeActions.find((action) => {
+      const matchesId =
+        action.tradeId === tradeId ||
+        action.trade_id === tradeId ||
+        action._tradeId === tradeId ||
+        action.related_trade === tradeId;
+      if (!matchesId) return false;
+      const t = (action.type || "").toLowerCase();
+      // treat common exit indications as exit
+      return (
+        t.includes("book profit") ||
+        t.includes("bookprofit") ||
+        t.includes("stoploss") ||
+        t.includes("stoploss hit") ||
+        t.includes("exit")
+      );
+    });
+  };
 
   // Use slice state as source of truth for form fields
-  const selectedTrade = tradeForm.selectedTrade || DUMMY_TRADES[0] || null;
+  const selectedTrade =
+    tradeForm.selectedTrade ||
+    (tradesWithExit && tradesWithExit.length
+      ? tradesWithExit[0]
+      : trades && trades.length
+      ? trades[0]
+      : DUMMY_TRADES[0]) ||
+    null;
   const yourEntry = tradeForm.yourEntry ?? "";
   const quantity = tradeForm.quantity ?? "";
   const yourExit = tradeForm.yourExit ?? "";
 
   // Ensure the slice has an initial selectedTrade so inputs remain controlled
   useEffect(() => {
-    if (!tradeForm.selectedTrade && DUMMY_TRADES.length > 0) {
-      dispatch(setSelectedTrade(DUMMY_TRADES[0]));
+    if (!tradeForm.selectedTrade) {
+      const initial =
+        tradesWithExit && tradesWithExit.length
+          ? tradesWithExit[0]
+          : trades && trades.length
+          ? trades[0]
+          : DUMMY_TRADES[0];
+      if (initial) dispatch(setSelectedTrade(initial));
     }
   }, [tradeForm.selectedTrade, dispatch]);
+
+  // When backend trades are loaded, fetch trade actions for each and keep only trades that have an exit action
+  useEffect(() => {
+    let mounted = true;
+    const loadActionsAndFilter = async () => {
+      if (!trades || !trades.length) {
+        setTradesWithExit([]);
+        return;
+      }
+
+      try {
+        // Dispatch fetchTradeActions for all trades and wait for results
+        const fetches = trades.map((t) =>
+          dispatch(fetchTradeActions(t._id || t.id))
+        );
+
+        const results = await Promise.all(fetches);
+
+        // helper to detect exit in actions payload
+        const hasExitIn = (actionsArr) => {
+          if (!actionsArr || !actionsArr.length) return false;
+          return actionsArr.some((action) => {
+            const t = (action.type || "").toLowerCase();
+            return (
+              t.includes("book profit") ||
+              t.includes("bookprofit") ||
+              t.includes("stoploss") ||
+              t.includes("stoploss hit") ||
+              t.includes("exit")
+            );
+          });
+        };
+
+        const withExit = trades.filter((t, idx) => {
+          const res = results[idx];
+          if (!res) return false;
+          // if fulfilled and payload is array
+          if (
+            res.type &&
+            res.type.endsWith("/fulfilled") &&
+            Array.isArray(res.payload)
+          ) {
+            return hasExitIn(res.payload);
+          }
+          // fallback: check global tradeActions state for exit action
+          return !!getTradeExitAction(t._id || t.id);
+        });
+
+        if (mounted) setTradesWithExit(withExit);
+      } catch (err) {
+        console.error("Error prefetching trade actions:", err);
+      }
+    };
+
+    loadActionsAndFilter();
+
+    return () => {
+      mounted = false;
+    };
+  }, [trades, dispatch]);
   const [log, setLog] = useState([
     // Dummy logged trades for initial view
     {
@@ -98,7 +225,8 @@ const TradeDiary = () => {
   ]);
 
   // Function to handle form submission and P&L calculation
-  const handleSubmit = (e) => {
+  // submit handler: find partial match, ensure exit action exists, calculate pnl and persist
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!selectedTrade || !yourEntry || !quantity || !yourExit) {
@@ -106,23 +234,102 @@ const TradeDiary = () => {
       return;
     }
 
+    // find best match from backend trades by partial title match
+    const selectedTitle = (
+      selectedTrade.title ||
+      selectedTrade.trade_title ||
+      ""
+    ).toLowerCase();
+    const backendTrades = trades && trades.length ? trades : DUMMY_TRADES;
+    const found = backendTrades.find((t) => {
+      const tTitle = (t.title || t.trade_title || "").toLowerCase();
+      return (
+        (selectedTitle && tTitle.includes(selectedTitle)) ||
+        (tTitle && selectedTitle.includes(tTitle)) ||
+        tTitle === selectedTitle
+      );
+    });
+
+    // update matchedTrade local state for UI
+    setMatchedTrade(found || null);
+
+    let exitAction = null;
+    try {
+      if (found && (found._id || found.id)) {
+        // fetch latest trade actions for that trade from backend
+        // wait for fetch to complete so tradeActions state is populated
+        // dispatch returns a promise - use unwrap if available
+        // note: not using unwrap to keep compatibility
+        // but we'll await the dispatch anyway
+        // eslint-disable-next-line no-unused-vars
+        await dispatch(fetchTradeActions(found._id || found.id));
+
+        // find exit action in the populated tradeActions array
+        exitAction = getTradeExitAction(found._id || found.id);
+      }
+    } catch (err) {
+      console.error("Error fetching trade actions:", err);
+    }
+
+    if (!exitAction) {
+      alert(
+        "No exit action found for the selected recommendation. Cannot auto-log without an exit from backend."
+      );
+      return;
+    }
+
+    // parse numeric values
     const entry = parseFloat(yourEntry);
     const exit = parseFloat(yourExit);
-    const qty = parseInt(quantity);
-    const action = selectedTrade.trade_action.toLowerCase();
+    const qty = parseInt(quantity, 10);
+    const action = (
+      selectedTrade.trade_action ||
+      selectedTrade.action ||
+      "Buy"
+    ).toLowerCase();
 
-    // Determine multiplier (1 for Buy/Long, -1 for Sell/Short)
     const multiplier =
       action.includes("buy") || action.includes("long") ? 1 : -1;
-
     const rawPnl = (exit - entry) * qty * multiplier;
     const pnl = parseFloat(rawPnl.toFixed(2));
     const result = pnl >= 0 ? "Profit" : "Loss";
 
+    // determine current user id (redux or localStorage fallback)
+    // determine current user id (redux, fallback to localStorage)
+    // Or it could be the user object directly.
+    let currentUserId = user?._id || user?.user?._id;
+
+    if (!currentUserId) {
+      const storedUser = localStorage.getItem("crmUser");
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          // The stored user might also be nest || parsed?.user?._id;
+        } catch {}
+      }
+    }
+    if (!currentUserId) {
+      alert("Please log in to save trade logs.");
+      return;
+    }
+
+    // recommended values from backend trade + exit action
+    const recommendedEntry =
+      found?.entry_price ?? found?.entryPrice ?? found?.entry ?? null;
+    const recommendedExit =
+      exitAction?.price ?? exitAction?.exit_price ?? exitAction?.value ?? null;
+
     const newLogEntry = {
+      // keep a local id until backend responds
       id: `L-${Date.now()}`,
-      tradeTitle: selectedTrade.title,
-      action: selectedTrade.trade_action,
+      user_id: currentUserId,
+      trade_id: found?._id ?? found?.id ?? null,
+      tradeTitle: selectedTrade.title || selectedTrade.trade_title || "",
+      matchedTradeId: found?._id ?? found?.id ?? null,
+      matchedTradeTitle: found?.title || found?.trade_title || null,
+      action: selectedTrade.trade_action || selectedTrade.action || "",
+      recommendedEntry: recommendedEntry,
+      recommendedExit: recommendedExit,
       entry,
       exit,
       quantity: qty,
@@ -133,17 +340,44 @@ const TradeDiary = () => {
         day: "numeric",
         year: "numeric",
       }),
+      createdAt: new Date().toISOString(),
     };
 
-    // Add to local UI log state for immediate display
-    setLog([newLogEntry, ...log]);
+    // Optimistic UI update
+    setLog((prev) => [newLogEntry, ...prev]);
 
-    // Persist to redux slice loggedTrades and reset form fields in slice
-    dispatch(addTradeLog(newLogEntry));
-    dispatch(resetTradeForm());
+    // persist to backend using tradeLogSlice thunk
+    try {
+      const payloadForBackend = {
+        user_id: currentUserId,
+        trade_id: newLogEntry.trade_id,
+        trade_title: newLogEntry.tradeTitle,
+        action: newLogEntry.action,
+        recommended_entry: newLogEntry.recommendedEntry,
+        recommended_exit: newLogEntry.recommendedExit,
+        entry: newLogEntry.entry,
+        exit: newLogEntry.exit,
+        quantity: newLogEntry.quantity,
+        pnl: newLogEntry.pnl,
+        result: newLogEntry.result,
+        matched_trade_title: newLogEntry.matchedTradeTitle,
+        date: new Date().toISOString(),
+      };
 
-    // Show success message to user
-    alert("Trade logged successfully!");
+      // dispatch async thunk to save to backend and update tradeLogSlice
+      const res = await dispatch(addTradeDiaryEntry(payloadForBackend));
+      // if the thunk returned payload in res.payload, it will already be added to tradeLogSlice
+
+      // also persist to userTradeFormSlice loggedTrades for local history
+      dispatch(addTradeLog(newLogEntry));
+      dispatch(resetTradeForm());
+
+      alert("Trade logged successfully!");
+    } catch (error) {
+      console.error("Trade log error details:", error);
+      alert("Failed to log trade: " + (error.message || "Unknown error"));
+      return;
+    }
   };
 
   return (
@@ -182,26 +416,54 @@ const TradeDiary = () => {
                 <select
                   id="tradeSelect"
                   className="form-select"
-                  value={selectedTrade ? selectedTrade.id : ""}
+                  value={
+                    selectedTrade ? selectedTrade._id || selectedTrade.id : ""
+                  }
                   onChange={(e) => {
-                    const tradeId = parseInt(e.target.value);
+                    const tradeId = e.target.value;
+                    // prefer tradesWithExit, then trades, then dummy
                     const tradeObj =
-                      DUMMY_TRADES.find((t) => t.id === tradeId) || null;
-                    // update slice selected trade
+                      (tradesWithExit || []).find(
+                        (t) => String(t._id || t.id) === String(tradeId)
+                      ) ||
+                      (trades || []).find(
+                        (t) => String(t._id || t.id) === String(tradeId)
+                      ) ||
+                      DUMMY_TRADES.find(
+                        (t) => String(t.id) === String(tradeId)
+                      ) ||
+                      null;
                     dispatch(setSelectedTrade(tradeObj));
                   }}
                   required
                 >
-                  {DUMMY_TRADES.map((trade) => (
-                    <option key={trade.id} value={trade.id}>
-                      [{trade.trade_action}] {trade.title} (Rec. Entry:{" "}
-                      {trade.entry_price})
-                    </option>
-                  ))}
+                  <option value="">Select a recommendation...</option>
+                  {(tradesWithExit && tradesWithExit.length
+                    ? tradesWithExit
+                    : trades && trades.length
+                    ? trades
+                    : DUMMY_TRADES
+                  ).map((trade) => {
+                    // Compose title as [action] on [on] if available, else fallback
+                    const action = trade.trade_action || trade.action || "";
+                    const on = trade.on || "";
+                    const title = on
+                      ? `[${action}] on ${on}`
+                      : `[${action}] ${trade.title || trade.trade_title}`;
+                    return (
+                      <option
+                        key={trade._id || trade.id}
+                        value={trade._id || trade.id}
+                      >
+                        {title} (Rec. Entry:{" "}
+                        {trade.entry_price ?? trade.entry ?? trade.entryPrice})
+                      </option>
+                    );
+                  })}
                 </select>
                 {/* {selectedTrade && (
                                     <p className="small text-primary mt-1">
-                                        Action: **{selectedTrade.trade_action}** | Lot Size: **{selectedTrade.lot_size}** ({selectedTrade.trade_segment})
+                                        Action: **{selectedTrade?.trade_action || selectedTrade?.action}** | Lot Size: **{selectedTrade?.lot_size || selectedTrade?.lotSize}** ({selectedTrade?.trade_segment || selectedTrade?.segment})
                                     </p>
                                 )} */}
               </div>
@@ -365,7 +627,14 @@ const TradeDiary = () => {
             {log.map((entry, index) => (
               <tr key={entry.id}>
                 <td>{entry.date}</td>
-                <td className="fw-bold">{entry.tradeTitle}</td>
+                <td className="fw-bold">
+                  {entry.tradeTitle}
+                  {entry.matchedTradeId && (
+                    <small className="d-block text-muted">
+                      Matched: {entry.matchedTradeTitle}
+                    </small>
+                  )}
+                </td>
                 <td>
                   <span
                     className={`badge ${
@@ -378,10 +647,22 @@ const TradeDiary = () => {
                     {entry.action}
                   </span>
                 </td>
-                <td>{entry.entry.toFixed(2)}</td>
-                <td>{entry.entry.toFixed(2)}</td>
-                <td>{entry.exit.toFixed(2)}</td>
-                <td>{entry.exit.toFixed(2)}</td>
+                <td>
+                  {entry.recommendedEntry
+                    ? Number(entry.recommendedEntry).toFixed(2)
+                    : "-"}
+                </td>
+                <td>
+                  {entry.entry != null ? Number(entry.entry).toFixed(2) : "-"}
+                </td>
+                <td>
+                  {entry.recommendedExit
+                    ? Number(entry.recommendedExit).toFixed(2)
+                    : "-"}
+                </td>
+                <td>
+                  {entry.exit != null ? Number(entry.exit).toFixed(2) : "-"}
+                </td>
                 <td>{entry.quantity}</td>
                 <td
                   className={`fw-bold ${
