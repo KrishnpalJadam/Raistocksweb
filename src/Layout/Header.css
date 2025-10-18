@@ -1,0 +1,9 @@
+.raibutton {
+  background-color: transparent;
+  border: 2px solid #bababa;
+  /* width: 100px; */
+  text-align: center;
+  color: black;
+  background-color: blue !important;
+  color: white;
+}

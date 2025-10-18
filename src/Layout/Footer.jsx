@@ -1,5 +1,5 @@
 import React from 'react';
-
+import logo from "../assets/logo.png"
 const Footer = () => {
   return (
     <div>
@@ -8,8 +8,7 @@ const Footer = () => {
     <div className="row pt-4 pb-3">
       <div className="col-lg-3 col-md-6 mb-4">
         <a href="#" className="footer-logo-text d-block mb-3">
-          <span className="bi bi-graph-up-arrow me-2" />
-          **RAI**Stocks
+         <img src={logo} alt="" />
         </a>
         <p className="small">
           SEBI Registered Research Analyst. Reg. No.: INH200000XXX

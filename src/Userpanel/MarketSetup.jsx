@@ -1,22 +1,84 @@
-// MarketSetup.jsx
-import React from 'react';
-import { Target, Scale, Zap, TrendingUp, TrendingDown, BookOpen } from 'lucide-react';
 
-// NOTE: Ensure your rai-dashboard.css includes the necessary utility classes.
+
+
+
+// MarketSetup.jsx
+import React, { useEffect, useRef } from "react";
+import { Target, Scale, TrendingUp, TrendingDown, BookOpen, X } from "lucide-react";
+import { Link } from "react-router-dom";
+// import Chart from "chart.js/auto";
+import { GaugeController, Needle } from "chartjs-gauge"; // ✅ Important import
+
 
 const MarketSetup = () => {
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+
+
+const data = [25, 25, 25, 25]; // 4 segments 25% each
+const config = {
+  type: "gauge",
+  data: {
+    datasets: [
+      {
+        value: 44.44, // needle position
+        minValue: 0,
+        data: [100], // total gauge span
+        valueColorStops: [
+          [0.0, "#8B0000"],  // Fear
+          [0.25, "#FF6347"], // Accumulation
+          [0.5, "#90EE90"],  // Distribution
+          [0.75, "#006400"], // Greed
+          [1.0, "#006400"]
+        ],
+        borderWidth: 1,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    layout: { padding: { bottom: 20 } },
+    needle: {
+      radiusPercentage: 2,
+      widthPercentage: 3.2,
+      lengthPercentage: 80,
+      color: "#000",
+    },
+    valueLabel: { display: false },
+    plugins: {
+      legend: { display: false },
+      title: { display: true, text: "Market Phase Meter" },
+    },
+  },
+};
+
+
+
+const ctx = chartRef.current.getContext('2d');
+window.myGauge = new Chart(ctx, config);
+ 
+
+    // Cleanup
+    return () => {
+      if (window.myGauge) {
+        window.myGauge.destroy();
+      }
+    };
+  }, []);
+
   // --- DUMMY MARKET SETUP DATA ---
   const dummySetupData = {
     keyLevels: {
       support: [
-        { level: "24,500 - 24,550 (Psychological/Fib)", comment: "Major support zone, breakdown could trigger deep correction." },
-        { level: "24,300 (Weekly Low)", comment: "Short-term crucial support; intraday bias turns weak below this." },
-        { level: "23,800 (20-Day EMA)", comment: "Strong technical cushion for the medium-term trend." },
+        { level: "24,500 - 24,550", comment: "Major support zone, breakdown could trigger correction." },
+        { level: "24,300", comment: "Short-term crucial support; bias turns weak below this." },
+        { level: "23,800", comment: "Strong cushion for the medium-term trend." },
       ],
       resistance: [
-        { level: "25,000 - 25,050 (Psychological/Swing High)", comment: "Immediate hurdle; sustained closing above this is highly bullish." },
-        { level: "25,200 (All-Time High)", comment: "Ultimate barrier; new uptrend starts upon breach." },
-        { level: "25,350 (Projected Extension T1)", comment: "Upper band of channel." },
+        { level: "25,000 - 25,050", comment: "Immediate hurdle; sustained closing above this is bullish." },
+        { level: "25,200", comment: "Ultimate barrier; new uptrend starts upon breach." },
+        { level: "25,350", comment: "Upper band of channel." },
       ],
     },
     patterns: [
@@ -25,99 +87,141 @@ const MarketSetup = () => {
         icon: Scale,
         name: "Ascending Triangle",
         status: "Active (Breakout pending)",
-        comment: "Developing on the Daily chart. Suggests consolidation with a potential upward breakout.",
-        color: '#ffc107', // Yellow for Warning/Pending
+        comment: "Developing on the Daily chart, indicating potential upward breakout.",
       },
       {
         title: "Candle Pattern",
         icon: BookOpen,
         name: "Doji (Weekly)",
         status: "Confirmed (Indecision)",
-        comment: "Indicates market fatigue and indecision at high levels. A cautionary signal.",
-        color: '#6c757d', // Gray/Muted for Indecision
+        comment: "Shows market indecision at high levels — caution advised.",
       },
     ],
     events: [
       {
-        title: "Breakout/Breakdown",
+        title: "Breakdown Event",
         icon: TrendingDown,
         name: "Bank Nifty Breakdown",
         status: "Confirmed Breakdown",
         price: "Below 54,000",
-        comment: "A sharp breakdown below the 54,000 support, suggesting weakness in the financial sector.",
-        color: '#dc3545', // Red for Breakdown
+        comment: "Breakdown below key support suggests weakness in financial sector.",
       },
       {
-        title: "Retest/Confirmation",
+        title: "Retest Confirmation",
         icon: TrendingUp,
         name: "Midcap Index Retest",
         status: "Retest Successful",
         price: "At 42,100",
-        comment: "Midcap index successfully retested the previous breakout zone, confirming strength for the next leg up.",
-        color: '#198754', // Green for Confirmation
+        comment: "Midcap index retested previous breakout zone — strength confirmed.",
       },
-    ]
+    ],
   };
 
-  // Helper Card Component for Patterns/Events
-  const SetupCard = ({ title, icon: Icon, name, status, price, comment, color }) => (
-    <div className="rai-card card mb-4 h-100" style={{ borderLeft: `4px solid ${color}` }}>
+  const SetupCard = ({ title, icon: Icon, name, status, price, comment }) => (
+    <div className="card shadow-sm mb-4 border-primary h-100">
       <div className="card-body">
-        <div className="rai-flex-header mb-2">
-          <div className="rai-icon-bg me-3" style={{ backgroundColor: `${color}15` }}>
-            <Icon size={24} color={color} />
+        <div className="d-flex align-items-center mb-3">
+          <div className="bg-primary bg-opacity-10 rounded p-2 me-3 d-flex align-items-center justify-content-center">
+            <Icon size={20} color="#0d6efd" />
           </div>
-          <h6 className="rai-insight-title mb-0" style={{ color: color }}>{title}</h6>
+          <h6 className="mb-0 text-primary fw-semibold">{title}</h6>
         </div>
-        <h4 className="card-title h5 mb-1">{name}</h4>
-        {price && <p className="mb-1 small text-muted">Price Action: **{price}**</p>}
-        <p className={`fw-bold small mb-1`} style={{ color: color }}>Status: {status}</p>
-        <p className="card-text small text-dark">{comment}</p>
-        {/* Optional Image Placeholder */}
-        {name.includes('Triangle') && (
-          <div className="mt-2 p-2 bg-light text-center border rounded">
-
-
-            [Image of Ascending Triangle Chart Pattern]
-
-          </div>
-        )}
+        <h5 className="fw-bold mb-1">{name}</h5>
+        {price && <p className="text-muted small mb-1">Price Action: {price}</p>}
+        <p className="small fw-semibold text-primary mb-1">Status: {status}</p>
+        <p className="small text-secondary mb-0">{comment}</p>
       </div>
     </div>
   );
 
   return (
-    <div className="rai-module-content p-3">
-      <h2 className="border-bottom pb-2 mb-4 text-primary">Market Setup: Technical Structure</h2>
+    <div className="container-fluid py-3 market-meter-container">
+      <div className="d-flex justify-content-between mb-4">
+        <h4 style={{ fontWeight: "600" }}>Market Setup</h4>
+        <Link
+          to="/customer/dashboard"
+          className="d-flex align-items-center justify-content-center text-dark bg-white border rounded-pill shadow-sm"
+          style={{ width: "36px", height: "36px" }}
+        >
+          <X size={20} />
+        </Link>
+      </div>
 
-      {/* 1. Support & Resistance Section */}
+      {/* === METER SECTION === */}
+      <div className="card shadow-sm border-primary mb-4 p-3">
+        <div className="row mb-3">
+          <div className="col-6 text-center">
+            <div className="market-meter-box bg-light border rounded py-2 fw-bold">
+              BankNifty Spot – 56,850
+            </div>
+          </div>
+          <div className="col-6 text-center">
+            <div className="market-meter-box bg-light border rounded py-2 fw-bold text-success">
+              Trend – Bullish
+            </div>
+          </div>
+        </div>
+        <div className="text-center" style={{ width: "300px", marginLeft: "auto", marginRight: "auto" }}>
+          <canvas ref={chartRef} width="300" height="150"></canvas>
+          <div className="mt-2 fw-bold text-success fs-6">Current Phase: Greed</div>
+
+
+        </div>
+        <div className="d-flex justify-content-end colorbox mt-2 gap-3">
+          {/* Fear */}
+          <div className="d-flex align-items-center gap-1">
+            <div style={{ width: "12px", height: "12px", backgroundColor: "#8B0000", borderRadius: "2px" }}></div>
+            <small className="text-muted">Fear</small>
+          </div>
+
+          {/* Accumulation */}
+          <div className="d-flex align-items-center gap-1">
+            <div style={{ width: "12px", height: "12px", backgroundColor: "#FF6347", borderRadius: "2px" }}></div>
+            <small className="text-muted">Accumulation</small>
+          </div>
+
+          {/* Distribution */}
+          <div className="d-flex align-items-center gap-1">
+            <div style={{ width: "12px", height: "12px", backgroundColor: "#90EE90", borderRadius: "2px" }}></div>
+            <small className="text-muted">Distribution</small>
+          </div>
+
+          {/* Greed */}
+          <div className="d-flex align-items-center gap-1">
+            <div style={{ width: "12px", height: "12px", backgroundColor: "#006400", borderRadius: "2px" }}></div>
+            <small className="text-muted">Greed</small>
+          </div>
+        </div>
+
+      </div>
+
+      {/* --- Support & Resistance --- */}
       <div className="row mb-4">
-        <div className="col-12 col-md-6 mb-3">
-          <div className="card h-100 rai-card-levels border-danger">
-            <div className="card-header bg-danger text-white fw-bold d-flex align-items-center">
+        <div className="col-6 mb-3">
+          <div className="card border-primary shadow-sm h-100">
+            <div className="card-header bg-primary text-white fw-bold d-flex align-items-center">
               <Target size={18} className="me-2" /> Key Resistance Levels
             </div>
             <ul className="list-group list-group-flush">
-              {dummySetupData.keyLevels.resistance.map((item, index) => (
-                <li key={`R-${index}`} className="list-group-item small">
-                  <span className="fw-bold text-danger me-2">{item.level}</span>
-                  <span className="text-muted">({item.comment})</span>
+              {dummySetupData.keyLevels.resistance.map((item, i) => (
+                <li key={`R-${i}`} className="list-group-item small">
+                  <span className="fw-semibold text-primary me-2">{item.level}</span>
                 </li>
               ))}
             </ul>
+
           </div>
         </div>
 
-        <div className="col-12 col-md-6 mb-3">
-          <div className="card h-100 rai-card-levels border-success">
-            <div className="card-header bg-success text-white fw-bold d-flex align-items-center">
+        <div className="col-6 mb-3">
+          <div className="card border-primary shadow-sm h-100">
+            <div className="card-header bg-primary text-white fw-bold d-flex align-items-center">
               <Target size={18} className="me-2" /> Key Support Levels
             </div>
             <ul className="list-group list-group-flush">
-              {dummySetupData.keyLevels.support.map((item, index) => (
-                <li key={`S-${index}`} className="list-group-item small">
-                  <span className="fw-bold text-success me-2">{item.level}</span>
-                  <span className="text-muted">({item.comment})</span>
+              {dummySetupData.keyLevels.support.map((item, i) => (
+                <li key={`S-${i}`} className="list-group-item small">
+                  <span className="fw-semibold text-primary me-2">{item.level}</span>
                 </li>
               ))}
             </ul>
@@ -125,30 +229,27 @@ const MarketSetup = () => {
         </div>
       </div>
 
-      {/* 2. Patterns and Events Section */}
-      <h4 className="mt-3 mb-3 text-secondary border-bottom pb-1">Current Patterns & Breakouts</h4>
+      {/* --- Patterns & Events --- */}
       <div className="row">
-        {/* Chart Pattern Card */}
-        <div className="col-12 col-md-6 col-lg-3">
-          <SetupCard {...dummySetupData.patterns[0]} />
-        </div>
-        {/* Candle Pattern Card */}
-        <div className="col-12 col-md-6 col-lg-3">
-          <SetupCard {...dummySetupData.patterns[1]} />
-        </div>
-        {/* Breakout/Breakdown Card */}
-        <div className="col-12 col-md-6 col-lg-3">
-          <SetupCard {...dummySetupData.events[0]} />
-        </div>
-        {/* Retest/Confirmation Card */}
-        <div className="col-12 col-md-6 col-lg-3">
-          <SetupCard {...dummySetupData.events[1]} />
-        </div>
+        {dummySetupData.patterns.concat(dummySetupData.events).map((item, i) => (
+          <div className="col-12 col-md-6 col-lg-3" key={i}>
+            <SetupCard {...item} />
+          </div>
+        ))}
       </div>
-
-     
     </div>
   );
 };
 
 export default MarketSetup;
+
+
+
+
+
+
+
+
+
+
+

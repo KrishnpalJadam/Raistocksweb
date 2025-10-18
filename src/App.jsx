@@ -1,3 +1,9 @@
+
+
+
+
+
+
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import "./App.css";
@@ -17,6 +23,14 @@ import ResearchReport from "./Userpanel/ResearchReport";
 import ModelPortfolio from "./Userpanel/ModelPortfolio";
 import TradeDiary from "./Userpanel/TradeDiary";
 import Footer from "./Layout/Footer";
+import About from "./Components/About";
+import ContactUs from "./Components/ContactUs";
+import Trader from "./Components/Trader";
+
+import Ourplan from "./Components/Ourplan";
+import { useEffect } from "react";
+import Investor from "./Components/Investor";
+import Profile from "./Userpanel/Profile";
 
 const AppWrapper = () => {
   const location = useLocation();
@@ -24,7 +38,10 @@ const AppWrapper = () => {
   // Conditions
   const isAuthRoute = location.pathname === "/login";
   const isCustomerRoute = location.pathname.startsWith("/customer/");
-
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   return (
     <>
       {/* Header Website me hi show karega */}
@@ -34,6 +51,11 @@ const AppWrapper = () => {
         {/* Website Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contactUs" element={<ContactUs />} />
+        <Route path="/trader" element={<Trader />} />
+        <Route path="/investor" element={<Investor />} />
+        <Route path="/ourplan" element={<Ourplan />} />
 
         {/* Customer Panel */}
         <Route path="/customer/*" element={<MainLayout />}>
@@ -49,6 +71,7 @@ const AppWrapper = () => {
           <Route path="research-report" element={<ResearchReport />} />
           <Route path="model-portfolio" element={<ModelPortfolio />} />
           <Route path="trade-diary" element={<TradeDiary />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
 
       </Routes>
@@ -67,3 +90,23 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

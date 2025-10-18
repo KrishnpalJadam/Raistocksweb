@@ -1,169 +1,189 @@
 import React, { useState } from "react";
-import { LogIn, Menu } from "lucide-react";
+import { LogIn, ChevronDown, Menu } from "lucide-react";
 import logo from "../assets/logo.png";
 import Login from "../auth/Login";
+import { Link, useLocation } from "react-router-dom";
+import "./Header.css";
 
 const Header = () => {
   const [showLogin, setShowLogin] = useState(false);
+  const location = useLocation();
+
+  const menuItems = [
+    { name: "Home", to: "/" },
+    { name: "About", to: "/about" },
+    {
+      name: "Services",
+      submenu: [
+        { name: "Trader", to: "/trader" },
+        { name: "Investor", to: "/investor" },
+      ],
+    },
+    {
+      name: "Calculators",
+      submenu: [
+        { name: "SIP", to: "#sip" },
+        { name: "SWP", to: "/" },
+        { name: "Rai Mambership Billng", to: "/" },
+        { name: "Special", to: "/" },
+      ],
+    },
+    { name: "Contact", to: "/contactUs" },
+  ];
+
+  const isActive = (item) => {
+    if (item.to) return location.pathname === item.to;
+    if (item.submenu) return item.submenu.some(sub => location.hash === sub.href);
+    return false;
+  };
+
+  const closeOffcanvas = () => {
+    const offcanvasEl = document.getElementById("offcanvasNavbar");
+    const offcanvas = window.bootstrap.Offcanvas.getInstance(offcanvasEl);
+    if (offcanvas) offcanvas.hide();
+  };
 
   return (
-    <header
-      className="shadow-sm sticky-top bg-white"
-      style={{ zIndex: 1050 }}
-    >
-      <nav className="navbar navbar-light py-3">
-        <div className="container d-flex align-items-center justify-content-between">
-          {/* Logo */}
-          <a href="/" className="navbar-brand d-flex align-items-center">
-            <img
-              src={logo}
-              alt="RAI Logo"
-              className="me-2"
-              style={{ height: 40 }}
-            />
-          </a>
+    <header className="shadow-sm">
+      <nav className="navbar navbar-expand-lg  container">
+        <Link className="navbar-brand d-flex align-items-center" to="/">
+          <img src={logo} alt="RAI Logo" style={{ height: 60 }} />
+        </Link>
 
-          {/* Desktop Menu */}
-          <ul className="d-none d-lg-flex list-unstyled mb-0 align-items-center gap-4">
-            <li><a href="#home" className="nav-link text-dark fw-medium">Home</a></li>
-            <li><a href="#about" className="nav-link text-dark fw-medium">About</a></li>
+        {/* Mobile Menu Button */}
+        <button
+          className="btn d-lg-none border-0"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasNavbar"
+          aria-controls="offcanvasNavbar"
+        >
+          <Menu size={26} />
+        </button>
 
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle text-dark fw-medium"
-                href="#services"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Services
-              </a>
-              <ul className="dropdown-menu shadow-sm">
-                <li><a className="dropdown-item" href="#equity">Equity</a></li>
-                <li><a className="dropdown-item" href="#commodities">Commodities</a></li>
-                <li><a className="dropdown-item" href="#forex">Forex</a></li>
-              </ul>
-            </li>
-
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle text-dark fw-medium"
-                href="#calculators"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Calculators
-              </a>
-              <ul className="dropdown-menu shadow-sm">
-                <li><a className="dropdown-item" href="#sip">SIP Calculator</a></li>
-                <li><a className="dropdown-item" href="#emi">EMI Calculator</a></li>
-              </ul>
-            </li>
-
-            <li><a href="#contact" className="nav-link text-dark fw-medium">Contact</a></li>
-
+        {/* Desktop Menu */}
+        <div className="d-none d-lg-flex justify-content-end flex-grow-1">
+          <ul className="navbar-nav align-items-center gap-3">
+            {menuItems.map((item, idx) =>
+              item.submenu ? (
+                <li className="nav-item dropdown" key={idx}>
+                  <a
+                    className={`nav-link dropdown-toggle position-relative ${isActive(item) ? "text-primary" : "text-black"}`}
+                    href="#!"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                  >
+                    {item.name} <ChevronDown size={16} />
+                    <span
+                      className={`position-absolute bottom-0 start-0 w-100 border-2 border-primary ${isActive(item) ? "" : "opacity-0"}`}
+                    ></span>
+                  </a>
+                  <ul className="dropdown-menu shadow rounded-3">
+                    {item.submenu.map((sub, i) => (
+                      <li key={i}>
+                        <Link
+                          className="dropdown-item text-dark fw-medium hover-bg-primary"
+                          to={sub.to}
+                        >
+                          {sub.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ) : (
+                <li className="nav-item" key={idx}>
+                  <Link
+                    to={item.to}
+                    className={`nav-link fw-medium ${isActive(item) ? "text-primary border-bottom border-2 border-primary" : "text-black"}`}
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              )
+            )}
             <li>
               <button
-                className="btn btn-primary rounded-pill px-3 d-flex align-items-center"
+                className="btn btn-primary raibutton d-flex align-items-center transition-hover"
                 onClick={() => setShowLogin(true)}
               >
-                <LogIn size={18} className="me-1" /> Login
+              Login
               </button>
             </li>
           </ul>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="btn d-lg-none border-0"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#offcanvasNavbar"
-            aria-controls="offcanvasNavbar"
-          >
-            <Menu size={26} />
-          </button>
-
-          {/* Offcanvas Menu */}
-          <div
-            className="offcanvas offcanvas-end"
-            tabIndex="-1"
-            id="offcanvasNavbar"
-            aria-labelledby="offcanvasNavbarLabel"
-          >
-            <div className="offcanvas-header">
-              <h5 className="offcanvas-title" id="offcanvasNavbarLabel">
-                <img src={logo} alt="RAI Logo" style={{ height: 35 }} />
-              </h5>
-              <button
-                type="button"
-                className="btn-close text-reset"
-                data-bs-dismiss="offcanvas"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="offcanvas-body">
-              <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
-                <li className="nav-item">
-                  <a className="nav-link" href="#home">Home</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link" href="#about">About</a>
-                </li>
-
-                <li className="nav-item dropdown">
-                  <a
-                    className="nav-link dropdown-toggle"
-                    href="#services"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    Services
-                  </a>
-                  <ul className="dropdown-menu">
-                    <li><a className="dropdown-item" href="#equity">Equity</a></li>
-                    <li><a className="dropdown-item" href="#commodities">Commodities</a></li>
-                    <li><a className="dropdown-item" href="#forex">Forex</a></li>
-                  </ul>
-                </li>
-
-                <li className="nav-item dropdown">
-                  <a
-                    className="nav-link dropdown-toggle"
-                    href="#calculators"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    Calculators
-                  </a>
-                  <ul className="dropdown-menu">
-                    <li><a className="dropdown-item" href="#sip">SIP Calculator</a></li>
-                    <li><a className="dropdown-item" href="#emi">EMI Calculator</a></li>
-                  </ul>
-                </li>
-
-                <li className="nav-item">
-                  <a className="nav-link" href="#contact">Contact</a>
-                </li>
-
-                <li className="mt-3">
-                  <button
-                    className="btn btn-primary w-100 rounded-pill"
-                    onClick={() => setShowLogin(true)}
-                    data-bs-dismiss="offcanvas"
-                  >
-                    <LogIn size={18} className="me-1" /> Login
-                  </button>
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
+
+        {/* Offcanvas Mobile Menu */}
+        {/* <div
+          className="offcanvas offcanvas-end"
+          tabIndex="-1"
+          id="offcanvasNavbar"
+          aria-labelledby="offcanvasNavbarLabel"
+        >
+          <div className="offcanvas-header">
+            <h5 className="offcanvas-title" id="offcanvasNavbarLabel">
+              <img src={logo} alt="RAI Logo" style={{ height: 35 }} />
+            </h5>
+            <button
+              type="button"
+              className="btn-close text-reset"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div className="offcanvas-body">
+            <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
+              {menuItems.map((item, idx) =>
+                item.submenu ? (
+                  <li className="nav-item dropdown" key={idx}>
+                    <a
+                      className="nav-link dropdown-toggle"
+                      href="#!"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      {item.name}
+                    </a>
+                    <ul className="dropdown-menu">
+                      {item.submenu.map((sub, i) => (
+                        <li key={i}>
+                          <a
+                            className="dropdown-item"
+                            href={sub.href}
+                            onClick={closeOffcanvas}
+                          >
+                            {sub.name}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ) : (
+                  <li className="nav-item" key={idx}>
+                    <Link
+                      to={item.to}
+                      className="nav-link"
+                      onClick={closeOffcanvas}
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                )
+              )}
+              <li className="mt-3">
+                <button
+                  className="btn btn-primary w-100"
+                  onClick={() => { setShowLogin(true); closeOffcanvas(); }}
+                >
+                  <LogIn size={18} className="me-1" /> Login
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div> */}
       </nav>
 
-      {/* Login Modal */}
       <Login show={showLogin} onClose={() => setShowLogin(false)} />
     </header>
   );
