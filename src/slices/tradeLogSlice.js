@@ -12,10 +12,12 @@ export const fetchTradeDiaryEntries = createAsyncThunk(
     try {
       const response = await axios.get(`${API_URL}/user/${userId}`);
 
-      // Backend often returns { success, data: [...] }
-      const data = Array.isArray(response.data)
-        ? response.data
-        : response.data?.data || [];
+      // ✅ Fix: handle all possible structures safely
+      const data =
+        response.data?.trades ||
+        response.data?.data?.trades ||
+        response.data?.data ||
+        [];
 
       console.log("Fetched diary logs from backend:", data);
       return data;
@@ -25,6 +27,7 @@ export const fetchTradeDiaryEntries = createAsyncThunk(
     }
   }
 );
+
 
 // ✅ 2. Add new trade diary entry
 export const addTradeDiaryEntry = createAsyncThunk(

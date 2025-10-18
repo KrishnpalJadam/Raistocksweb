@@ -68,7 +68,7 @@ const TradeDiary = () => {
   );
   const { actions: tradeActions } = useSelector((state) => state.tradeActions);
   const { user, loading: authLoading } = useSelector((state) => state.crmAuth);
-const diaryLogs = useSelector((state) => state.tradeLogs?.logs?.trades || []);
+const diaryLogs = useSelector((state) => state.tradeLogs?.logs || []);
 
   // Add a debug log to see when the user object is available from Redux
   useEffect(() => {
@@ -85,6 +85,7 @@ const diaryLogs = useSelector((state) => state.tradeLogs?.logs?.trades || []);
     if (user?.data?.id) {
       dispatch(fetchTrades());
 dispatch(fetchTradeDiaryEntries(user?.data?.id));
+console.log(diaryLogs)
     }
   }, [dispatch, user?.data?.id]);
 
@@ -301,36 +302,22 @@ dispatch(fetchTradeDiaryEntries(user?.data?.id));
     const recommendedExit =
       exitAction?.price ?? exitAction?.exit_price ?? exitAction?.value ?? null;
 
-    const newLogEntry = {
-      // keep a local id until backend responds
-      id: `L-${Date.now()}`,
-      trade_id: found?._id ?? found?.id ?? null,
-      user_id: currentUserId, // Fallback to selectedTrade's ID if no match is found
-      trade_id:
-        found?._id ??
-        found?.id ??
-        selectedTrade?._id ??
-        selectedTrade?.id ??
-        null,
-      tradeTitle:
-        found?.on || selectedTrade.title || selectedTrade.trade_title || "",
-      matchedTradeId: found?._id ?? found?.id ?? null,
-      matchedTradeTitle: found?.title || found?.trade_title || null,
-      action: selectedTrade.trade_action || selectedTrade.action || "",
-      recommendedEntry: recommendedEntry,
-      recommendedExit: recommendedExit,
-      entry,
-      exit,
-      quantity: qty,
-      pnl,
-      result,
-      date: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-      createdAt: new Date().toISOString(),
-    };
+ const newLogEntry = {
+  id: `L-${Date.now()}`,
+  user_id: currentUserId,
+  trade_id: found?._id ?? found?.id ?? null,
+  tradeTitle:
+    found?.on || selectedTrade.on || selectedTrade.title || selectedTrade.trade_title || "",
+  recommendedEntry: found?.entry_price ?? found?.entryPrice ?? found?.entry ?? null,
+  recommendedExit: exitAction?.price ?? exitAction?.exit_price ?? exitAction?.value ?? null,
+  entry: entry, // user entry
+  exit: exit, // user exit
+  quantity: qty,
+  pnl,
+  result,
+  date: new Date().toISOString(),
+};
+
 
     // persist to backend using tradeLogSlice thunk
     try {
