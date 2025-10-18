@@ -15,16 +15,7 @@ const Login = ({ show, onClose }) => {
 
   const { user, loading, error } = useSelector((state) => state.crmAuth);
 
-  // 🔁 If already logged in, auto redirect to dashboard
-  useEffect(() => {
-    if (user) {
-      toast.success("Login successful 🎉");
-      setTimeout(() => {
-        onClose();
-        navigate("/customer/dashboard");
-      }, 1500);
-    }
-  }, [user, navigate, onClose]);
+ 
 
   // ❌ Don't show if modal is closed
   if (!show) return null;

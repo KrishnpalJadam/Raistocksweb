@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import SubscribeModal from './SubscribeModal';
 import { useLocation } from 'react-router-dom';
 
+
 // --- Investor Plans ---
 const investorPlans = [
 
@@ -229,6 +230,8 @@ const trialPlan = [
 ];
 
 
+ 
+
 // --- Pricing Card Component ---
 const PricingCard = ({ plan, onSubscribe }) => (
   <div className={`pricing-card-container ${plan.isPopular ? 'popular-card' : ''}`}>
@@ -295,6 +298,8 @@ const Ourplan = () => {
   const location = useLocation();
   const [activeSegment, setActiveSegment] = useState('Investor');
   const [showTrialOnly, setShowTrialOnly] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState(null); // moved inside
+
 
   useEffect(() => {
     // 🔹 If navigated from Start Trial button
@@ -313,9 +318,11 @@ const Ourplan = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSubscribeClick = () => {
-    setIsModalOpen(true);
-  };
+const handleSubscribeClick = (plan) => {
+  setSelectedPlan(plan);
+  setIsModalOpen(true);
+};
+
 
   const handleModalSubmit = (data) => {
     console.log('User Data:', data);
@@ -356,22 +363,27 @@ const Ourplan = () => {
           }
         >
           {currentPlans.map((plan) => (
-            <PricingCard
-              key={plan.id}
-              plan={plan}
-              onSubscribe={handleSubscribeClick}
-            />
+     <PricingCard
+  key={plan.id}
+  plan={plan}
+  onSubscribe={() => handleSubscribeClick(plan)}
+/>
+
+
           ))}
         </div>
 
-        <SubscribeModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleModalSubmit}
-        />
+<SubscribeModal
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  onSubmit={handleModalSubmit}
+  selectedPlan={selectedPlan}
+/>
+
       </div>
     </div>
   );
 };
 
 export default Ourplan;
+          onSubmit={handleModalSubmit}
