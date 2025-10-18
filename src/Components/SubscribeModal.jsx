@@ -3,6 +3,8 @@ import "./SubscribeModal.css";
 import { X } from "lucide-react";
 
 const SubscribeModal = ({ isOpen, onClose, onSubmit, selectedPlan }) => {
+
+  const API_BASE = import.meta.env.VITE_API_URL
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,7 +29,7 @@ const SubscribeModal = ({ isOpen, onClose, onSubmit, selectedPlan }) => {
     try {
       // 1️⃣ Call backend to create Razorpay order
       const createRes = await fetch(
-      `${API_URL}/api/subscription/create-order`,
+      `${API_BASE}/api/subscription/create-order`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -80,7 +82,7 @@ const SubscribeModal = ({ isOpen, onClose, onSubmit, selectedPlan }) => {
         handler: async function (response) {
           // 4️⃣ Verify payment on backend
           const verifyRes = await fetch(
-           `${API_URL}/api/subscription/verify-payment`,
+           `${API_BASE}/api/subscription/verify-payment`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
