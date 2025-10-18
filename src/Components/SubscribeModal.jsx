@@ -27,7 +27,7 @@ const SubscribeModal = ({ isOpen, onClose, onSubmit, selectedPlan }) => {
     try {
       // 1️⃣ Call backend to create Razorpay order
       const createRes = await fetch(
-        "http://localhost:5000/api/subscription/create-order",
+      `${API_URL}/api/subscription/create-order`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -80,7 +80,7 @@ const SubscribeModal = ({ isOpen, onClose, onSubmit, selectedPlan }) => {
         handler: async function (response) {
           // 4️⃣ Verify payment on backend
           const verifyRes = await fetch(
-            "http://localhost:5000/api/subscription/verify-payment",
+           `${API_URL}/api/subscription/verify-payment`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
