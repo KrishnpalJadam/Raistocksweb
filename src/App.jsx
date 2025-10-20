@@ -16,7 +16,7 @@ import TradeRecommendation from "./Userpanel/TradeRecommendation";
 import MarketInsight from "./Userpanel/MarketInsight";
 import MarketPhase from "./Userpanel/MarketPhase";
 import MarketTrend from "./Userpanel/MarketTrend";
-import MarketSetup from "./Userpanel/MarketSetup";
+
 import TradeSetup from "./Userpanel/TradeSetup";
 import TradeStrategy from "./Userpanel/TradeStrategy";
 import ResearchReport from "./Userpanel/ResearchReport";
@@ -31,6 +31,7 @@ import Ourplan from "./Components/Ourplan";
 import { useEffect } from "react";
 import Investor from "./Components/Investor";
 import Profile from "./Userpanel/Profile";
+import MarketSetup from "./Userpanel/MarketSetup";
 
 const AppWrapper = () => {
   const location = useLocation();

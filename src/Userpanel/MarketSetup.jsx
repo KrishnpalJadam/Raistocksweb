@@ -211,6 +211,7 @@ window.myGauge = new Chart(ctx, config);
             </ul>
 
           </div>
+         
         </div>
 
         <div className="col-6 mb-3">
@@ -227,6 +228,9 @@ window.myGauge = new Chart(ctx, config);
             </ul>
           </div>
         </div>
+         <div>
+            <textarea name="" className="form-input" id=""></textarea>
+          </div>
       </div>
 
       {/* --- Patterns & Events --- */}
@@ -237,19 +241,18 @@ window.myGauge = new Chart(ctx, config);
           </div>
         ))}
       </div>
+
+      <div>
+        <button className="btn btn-primary mt-3">
+  See Image
+        </button>
+      
+      </div>
     </div>
   );
 };
 
 export default MarketSetup;
-
-
-
-
-
-
-
-
 
 
 
