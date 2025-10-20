@@ -15,7 +15,14 @@ const Login = ({ show, onClose }) => {
 
   const { user, loading, error } = useSelector((state) => state.crmAuth);
 
- 
+  
+  useEffect(() => {
+    // If login is successful (user object is populated), close modal and navigate
+    if (user) {
+      onClose(); // Close the modal
+      navigate("/customer/dashboard"); // Navigate to the dashboard
+    }
+  }, [user, navigate, onClose]);
 
   // ❌ Don't show if modal is closed
   if (!show) return null;
