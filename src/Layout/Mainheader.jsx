@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { Bell, User, Menu, X, LineChart } from 'lucide-react';
 import logo from "../assets/logo.png"
 import { Link, useNavigate } from 'react-router-dom';
+import HelpPopup from './HelpPopup';
 
 const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar }) => {
   // Show Menu/X for mobile; for desktop toggle collapse
@@ -18,6 +19,8 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
   const homePage = () => {
     navigate('/customer/dashboard')
   }
+    const [showHelp, setShowHelp] = useState(false); // ✅ For help popup
+
   const [darkMode, setDarkMode] = useState(false);
 
   const toggleDarkMode = () => {
@@ -25,6 +28,7 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
     document.body.classList.toggle("dark-mode", !darkMode); // poore page ke liye
   };
   return (
+        <>  
     <header className="rai-dashboard-header">
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
@@ -195,6 +199,29 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
         </button>
       </div>
     </header>
+
+    {/* ✅ Fixed Help Button */}
+      <button
+        onClick={() => setShowHelp(true)}
+        className="btn btn-primary rounded-circle shadow-lg helppop"
+        style={{
+          position: "fixed",
+          bottom: "25px",
+          right: "25px",
+          zIndex: 1050,
+          width: "50px",
+          height: "50px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "22px",
+        }}
+      >
+        ❔
+      </button>
+       {/* ✅ Help Popup Component */}
+      {showHelp && <HelpPopup onClose={() => setShowHelp(false)} />}
+    </>
   );
 };
 
