@@ -1057,6 +1057,9 @@ a {
     flex-direction: column;
     margin-left: auto;
   }
+  .helppop{
+  min-width: 50px !important;
+  }
 }
 
 
