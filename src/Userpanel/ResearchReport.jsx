@@ -62,57 +62,57 @@ const ResearchReport = () => {
         {reports.length === 0 && !loading && (
           <p className="text-muted small">No reports available.</p>
         )}
-{Array.isArray(reports) &&
-  reports.map((report) => (
-          <div
-            key={report._id}
-            className="list-group-item repot list-group-item-action d-flex justify-content-between align-items-center rai-report-item"
-          >
-            <div className="d-flex align-items-center">
-              <div
-                className="rai-icon-bg me-3"
-                style={{
-                  backgroundColor: `${getIconColor(report.type)}15`,
-                  minWidth: "40px",
-                  height: "40px",
-                  borderRadius: "8px",
-                }}
-              >
-                <FileText size={20} color={getIconColor(report.type)} />
+        {Array.isArray(reports) &&
+          reports.map((report) => (
+            <div
+              key={report._id}
+              className="list-group-item repot list-group-item-action d-flex justify-content-between align-items-center rai-report-item"
+            >
+              <div className="d-flex align-items-center">
+                <div
+                  className="rai-icon-bg me-3"
+                  style={{
+                    backgroundColor: `${getIconColor(report.type)}15`,
+                    minWidth: "40px",
+                    height: "40px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <FileText size={20} color={getIconColor(report.type)} />
+                </div>
+
+                <div>
+                  <h5 className="mb-0 fw-bold" style={{ fontSize: "1rem" }}>
+                    {report.title}
+                  </h5>
+                  <p className="text-muted mb-0 small">
+                    {report.fileName} (Research Report)
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <h5 className="mb-0 fw-bold" style={{ fontSize: "1rem" }}>
-                  {report.title}
-                </h5>
-                <p className="text-muted mb-0 small">
-                  {report.fileName} (Research Report)
-                </p>
+              <div className="d-flex align-items-center flex-shrink-0">
+                <div className="text-end me-4 d-none d-md-block">
+                  <span className="d-block small text-muted">
+                    Date: {new Date(report.createdAt).toLocaleDateString()}
+                  </span>
+                  <span className="d-block small text-muted">
+                    Type: {report.fileType?.split("/")[1]?.toUpperCase()}
+                  </span>
+                </div>
+
+                <a
+                  href={`${API_BASE}/api/research-reports/download/${report._id}`}
+                  className="btn btn-primary btn-sm d-flex align-items-center"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download={report.fileName}
+                >
+                  <Download size={16} className="me-1" /> Download
+                </a>
               </div>
             </div>
-
-            <div className="d-flex align-items-center flex-shrink-0">
-              <div className="text-end me-4 d-none d-md-block">
-                <span className="d-block small text-muted">
-                  Date: {new Date(report.createdAt).toLocaleDateString()}
-                </span>
-                <span className="d-block small text-muted">
-                  Type: {report.fileType?.split("/")[1]?.toUpperCase()}
-                </span>
-              </div>
-
-              <a
-                href={`${API_BASE}/api/research-reports/download/${report._id}`}
-                className="btn btn-primary btn-sm d-flex align-items-center"
-                target="_blank"
-                rel="noopener noreferrer"
-                download={report.fileName}
-              >
-                <Download size={16} className="me-1" /> Download
-              </a>
-            </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );

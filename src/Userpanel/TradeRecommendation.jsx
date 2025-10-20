@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTrades } from "../slices/tradeSlice"; // adjust import path
+import { fetchTrades } from "../slices/tradeSlice";
+import { fetchTradeActions } from "../slices/tradeActionsSlice";
 import { Link } from "react-router-dom";
 import "./Trade.css";
 import { X, Filter } from "lucide-react";
@@ -87,8 +88,91 @@ const TradeInfoRow = ({ label, value, className = "" }) => (
   </div>
 );
 
+const TradeActions = ({ tradeId }) => {
+  const dispatch = useDispatch();
+  const { actions, loading } = useSelector(
+    (state) => state.tradeActions || { actions: [], loading: false }
+  );
+
+  useEffect(() => {
+    if (tradeId) {
+      dispatch(fetchTradeActions(tradeId));
+    }
+  }, [tradeId, dispatch]);
+
+  // Filter actions to only show those matching this trade's ID
+  const tradeActions = actions.filter(
+    (action) =>
+      action.tradeId === tradeId ||
+      action.trade_id === tradeId ||
+      action._tradeId === tradeId
+  );
+
+  if (loading && !tradeActions.length) {
+    return (
+      <div className="trade-actions mt-3 text-center text-gray-500">
+        Loading actions...
+      </div>
+    );
+  }
+
+  if (!tradeActions.length) return null;
+
+  return (
+    <div className="trade-actions mt-3">
+      <h6 className="fw-bold mb-3">Trade Actions</h6>
+      <div className="flex flex-col gap-3">
+        {tradeActions.map((action) => {
+          const dateStr =
+            action.createdAt || action.createdDateAt || action.createdAtDate;
+          const displayDate = dateStr
+            ? new Date(dateStr).toLocaleDateString()
+            : "-";
+
+          return (
+            <div
+              key={action._id || action.id}
+              className="flex items-center justify-between p-3 bg-gray-50 rounded"
+            >
+              <div className="flex items-center gap-2">
+                <div
+                  className={`px-4 py-2 rounded ${
+                    action.type?.toLowerCase() === "update"
+                      ? "bg-blue-100 text-blue-700"
+                      : action.type?.toLowerCase().includes("profit")
+                      ? "bg-green-100 text-green-700"
+                      : action.type
+                      ? "bg-gray-100 text-gray-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {action.type ? action.type : "Unknown"}
+                </div>
+              </div>
+              <div className="flex flex-col items-end">
+                <div className="text-sm font-medium">
+                  ₹{action.price ?? "-"}
+                </div>
+                <div className="text-xs text-gray-500">{displayDate}</div>
+                {action.title && <div className="text-sm">{action.title}</div>}
+                {action.comment && (
+                  <div className="text-xs text-gray-600">{action.comment}</div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const TradeUpdatePill = ({ update }) => (
-  <div className={`trade-update-pill ${update.type?.toLowerCase().replace(" ", "-")}`}>
+  <div
+    className={`trade-update-pill ${update.type
+      ?.toLowerCase()
+      .replace(" ", "-")}`}
+  >
     <div className="update-price-time">
       <span className="update-price">
         ₹{update.price}
@@ -198,9 +282,10 @@ const TradeRecommendation = () => {
                 <span className="trade-date-time">
                   {new Date(trade.recommendationDateTime).toLocaleString()}
                 </span>
-                <span className="trade-type">
+
+                <button className="butonsss text-muted">
                   {trade.segment} | {trade.tradeType}
-                </span>
+                </button>
               </div>
 
               <div className="trade-details-grid">
@@ -218,18 +303,22 @@ const TradeRecommendation = () => {
                   <TradeInfoRow label="Lot Size" value={trade.lotSize} />
                 )}
               </div>
+              {/* Trade Actions Display */}
+              <TradeActions tradeId={trade._id} />
 
-              <div className="d-flex justify-content-between">
+              {/* <div className="d-flex justify-content-between">
                 <div className="mt-4">
                   <button className="butonsss text-muted">Update</button>
                 </div>
-                <div>
+                {/* <div>
                   {trade.updates &&
                     trade.updates.map((update, index) => (
                       <TradeUpdatePill key={index} update={update} />
                     ))}
-                </div>
-              </div>
+                </div> 
+              </div> */}
+
+              {/* --------- */}
 
               {trade.status === "Closed" && (
                 <div
@@ -257,16 +346,9 @@ const TradeRecommendation = () => {
 
 export default TradeRecommendation;
 
-
-
-
-
-
-
 // import React, { useState } from "react";
 
 // import {  X, Filter, BookOpen } from "lucide-react";
-
 
 // const TRADE_CHOICES = {
 //     trade_segment: ["Cash", "Index future", "Index option", "Commodity future", "Commodity option", "Stock future", "Stock option"],
@@ -527,10 +609,10 @@ export default TradeRecommendation;
 // // --- Full Trade Modal Component (Row Expand) ---
 // const FullTradeModal = ({ trade, onClose }) => {
 //     if (!trade) return null;
-    
+
 //     // Get PnL Example for closed trade
 //     const pnlResult = trade.closingData;
-    
+
 //     return (
 //         <div className="modal-overlay">
 //             <div className="modal-content p-4" style={{ maxWidth: '800px' }}>
@@ -540,7 +622,7 @@ export default TradeRecommendation;
 //                         <X size={18} />
 //                     </button>
 //                 </div>
-                
+
 //                 {/* Status and P&L Summary */}
 //                 <div className={`p-3 rounded-3 mb-4 d-flex justify-content-between align-items-center ${trade.isClosed ? (pnlResult.result === 'Profit' ? 'bg-success-subtle' : 'bg-danger-subtle') : 'bg-info-subtle'}`}>
 //                     <span className={`fw-bold h5 mb-0 ${trade.isClosed ? (pnlResult.result === 'Profit' ? 'text-success' : 'text-danger') : 'text-info'}`}>
@@ -566,7 +648,7 @@ export default TradeRecommendation;
 //                             <TradeInfoRow label="Duration" value={trade.duration} />
 //                             <TradeInfoRow label="Date/Time" value={trade.recommendation_date_time} />
 //                         </div>
-                        
+
 //                         <h5 className="mb-3 text-secondary">Advanced</h5>
 //                         <div className="trade-details-grid-full">
 //                             <TradeInfoRow label="Weightage" value={`${trade.weightage_value} ${trade.weightage_extension}`} />
@@ -577,10 +659,10 @@ export default TradeRecommendation;
 
 //                         {trade.attached_doc && (
 //                             <div className="mt-4">
-//                                 <a 
-//                                     href={trade.attached_doc} 
-//                                     target="_blank" 
-//                                     rel="noopener noreferrer" 
+//                                 <a
+//                                     href={trade.attached_doc}
+//                                     target="_blank"
+//                                     rel="noopener noreferrer"
 //                                     className="btn btn-primary d-flex align-items-center"
 //                                 >
 //                                     <BookOpen size={16} className="me-2" /> Open Recommendation Document (.{(trade.attached_doc.split('.').pop())})
@@ -692,14 +774,14 @@ export default TradeRecommendation;
 //                             {/* Latest Update & View Details Button */}
 //                             <div className="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
 //                                 <div>
-//                                     <button 
+//                                     <button
 //                                         className="btn btn-sm btn-outline-primary"
 //                                         onClick={() => setSelectedTrade(trade)}
 //                                     >
 //                                         View Details
 //                                     </button>
 //                                 </div>
-                                
+
 //                                 {trade.isClosed && trade.closingData ? (
 //                                     <div className="text-end">
 //                                         <PnLCalculator entry={trade.entry_price} exit={trade.closingData.exitPrice} lotInfo={trade} action={trade.trade_action} />
@@ -711,7 +793,7 @@ export default TradeRecommendation;
 //                                     <div className="text-end small">
 //                                         <span className={`fw-bold ${trade.updates[0].update_type === 'Book profit' ? 'text-success' : 'text-primary'}`}>
 //                                             {trade.updates[0].update_type}
-//                                         </span> 
+//                                         </span>
 //                                         <p className="text-muted mb-0 mt-1" style={{ fontSize: '11px' }}>
 //                                             {trade.updates[0].update_date_time}
 //                                         </p>

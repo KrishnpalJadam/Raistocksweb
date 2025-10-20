@@ -9,20 +9,18 @@ import { loginCRMUser } from "../slices/crmAuthSlice"; // adjust path
 const Login = ({ show, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { user, loading, error } = useSelector((state) => state.crmAuth);
 
-  // 🔁 If already logged in, auto redirect to dashboard
+  
   useEffect(() => {
+    // If login is successful (user object is populated), close modal and navigate
     if (user) {
-      toast.success("Login successful 🎉");
-      setTimeout(() => {
-        onClose();
-        navigate("/customer/dashboard");
-      }, 1500);
+      onClose(); // Close the modal
+      navigate("/customer/dashboard"); // Navigate to the dashboard
     }
   }, [user, navigate, onClose]);
 
@@ -54,9 +52,12 @@ const Login = ({ show, onClose }) => {
             alt="Hand Mobile"
             className="img-fluid"
           />
-          <h4 className="mt-3 text-primary d-none">Redefine your investing experience</h4>
+          <h4 className="mt-3 text-primary d-none">
+            Redefine your investing experience
+          </h4>
           <p className="text-muted d-none">
-            Login to Raistocks and manage your trading smarter with actionable insights.
+            Login to Raistocks and manage your trading smarter with actionable
+            insights.
           </p>
         </div>
 
@@ -104,7 +105,8 @@ const Login = ({ show, onClose }) => {
           {error && <p className="text-danger small mt-2">{error}</p>}
 
           <p className="mt-3 small text-muted">
-            By logging in, you agree to our <a href="#terms">Terms & Conditions</a>
+            By logging in, you agree to our{" "}
+            <a href="#terms">Terms & Conditions</a>
           </p>
         </div>
       </div>
