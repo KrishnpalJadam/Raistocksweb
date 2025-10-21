@@ -33,15 +33,17 @@ const SubscribeModal = ({ isOpen, onClose, onSubmit, selectedPlan }) => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            dob: formData.dob,
-            pan: formData.pancard,
-            planId: selectedPlan.id,
-            amount: parseInt(selectedPlan.price.replace(/,/g, "")), // remove commas
-          }),
+        body: JSON.stringify({
+  name: formData.name,
+  email: formData.email,
+  phone: formData.phone,
+  dob: formData.dob,
+  pan: formData.pancard,
+  planId: selectedPlan.id,
+  planName: selectedPlan.title, // ✅ added plan name
+  amount: parseInt(selectedPlan.price.replace(/,/g, "")), // remove commas
+}),
+
         }
       );
 

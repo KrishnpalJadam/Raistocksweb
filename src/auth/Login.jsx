@@ -4,7 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loginCRMUser } from "../slices/crmAuthSlice"; // adjust path
+import { loginClient } from "../slices/clientAuthSlice";
 
 const Login = ({ show, onClose }) => {
   const [email, setEmail] = useState("");
@@ -36,7 +36,7 @@ const Login = ({ show, onClose }) => {
     }
 
     try {
-      await dispatch(loginCRMUser({ email, password })).unwrap();
+await dispatch(loginClient({ email })).unwrap();
     } catch (err) {
       toast.error(err || "Invalid credentials");
     }
