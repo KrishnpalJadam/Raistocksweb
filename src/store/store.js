@@ -9,6 +9,7 @@ import researchReportReducer from "../slices/researchReportSlice";
 import userTradeFormReducer from "../slices/userTradeFormSlice";
 import tradeLogReducer from "../slices/tradeLogSlice";
 import supportReducer from "../slices/supportSlice";
+import clientAuthReducer from "../slices/clientAuthSlice";
 
 const appReducer = combineReducers({
   crmAuth: crmAuthReducer,
@@ -21,6 +22,7 @@ const appReducer = combineReducers({
   userTradeForm: userTradeFormReducer,
   tradeLogs: tradeLogReducer,
   support: supportReducer,
+  clientAuth: clientAuthReducer, 
 });
 
 const rootReducer = (state, action) => {

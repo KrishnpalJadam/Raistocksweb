@@ -9,14 +9,12 @@ export const loginClient = createAsyncThunk(
   "clientAuth/loginClient",
   async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/login`, { email });
+      const response = await axios.post("http://localhost:5000/api/client/auth/login", { email });
       localStorage.setItem("clientToken", response.data.token);
       localStorage.setItem("client", JSON.stringify(response.data.client));
       return response.data.client;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
+      return rejectWithValue(err.response?.data?.message || "Login failed. Please try again.");
     }
   }
 );
