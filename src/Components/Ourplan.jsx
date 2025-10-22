@@ -87,7 +87,7 @@ const investorPlans = [
 // --- Trader Plans ---
 const traderPlans = [
   {
-    id: 1,
+    id: 2,
     title: "Professional",
     duration: "Monthly",
     price: "4,999",
@@ -178,7 +178,7 @@ const traderPlans = [
 // --- Trial Plan (hidden by default) ---
 const trialPlan = [
   {
-    id: 1,
+    id: 3,
     duration: "15 Days",
     price: "999",
     isPopular: false,

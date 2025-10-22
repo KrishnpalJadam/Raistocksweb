@@ -1,44 +1,46 @@
+// src/components/Login.jsx
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loginCRMUser } from "../slices/crmAuthSlice"; // adjust path
+import { loginClient } from "../slices/clientAuthSlice";
 
 const Login = ({ show, onClose }) => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [password] = useState("autofill"); // ✅ Just a placeholder, not used
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { user, loading, error } = useSelector((state) => state.crmAuth);
+  // ✅ Correct slice reference
+  const { client, loading, error } = useSelector((state) => state.clientAuth);
 
-  
   useEffect(() => {
-    // If login is successful (user object is populated), close modal and navigate
-    if (user) {
-      onClose(); // Close the modal
-      navigate("/customer/dashboard"); // Navigate to the dashboard
+    // ✅ If login successful → close modal + navigate
+    if (client) {
+      onClose();
+      navigate("/customer/dashboard");
     }
-  }, [user, navigate, onClose]);
+  }, [client, navigate, onClose]);
 
-  // ❌ Don't show if modal is closed
+  // ✅ Hide modal if not visible
   if (!show) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      toast.error("Please fill in both fields");
+    if (!email) {
+      toast.error("Please enter your email");
       return;
     }
 
     try {
-      await dispatch(loginCRMUser({ email, password })).unwrap();
+      await dispatch(loginClient({ email })).unwrap();
+      toast.success("Login successful!");
     } catch (err) {
-      toast.error(err || "Invalid credentials");
+      toast.error(err || "Invalid email");
     }
   };
 
@@ -56,8 +58,7 @@ const Login = ({ show, onClose }) => {
             Redefine your investing experience
           </h4>
           <p className="text-muted d-none">
-            Login to Raistocks and manage your trading smarter with actionable
-            insights.
+            Login to Raistocks and manage your trading smarter with actionable insights.
           </p>
         </div>
 
@@ -71,25 +72,26 @@ const Login = ({ show, onClose }) => {
           </div>
 
           <form onSubmit={handleSubmit}>
+            {/* Email Field */}
             <div className="mb-3">
               <label className="form-label">Email</label>
               <input
                 type="email"
                 className="form-control"
-                placeholder="Enter email"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
+            {/* Password Field (autofilled, not used) */}
             <div className="mb-3">
-              <label className="form-label">Password</label>
+              <label className="form-label">Password (auto-filled)</label>
               <input
                 type="password"
                 className="form-control"
-                placeholder="Enter password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                readOnly
               />
             </div>
 
@@ -102,16 +104,16 @@ const Login = ({ show, onClose }) => {
             </button>
           </form>
 
-          {error && <p className="text-danger small mt-2">{error}</p>}
+          {error && <p className="text-danger small mt-2 text-center">{error}</p>}
 
-          <p className="mt-3 small text-muted">
+          <p className="mt-3 small text-muted text-center">
             By logging in, you agree to our{" "}
             <a href="#terms">Terms & Conditions</a>
           </p>
         </div>
       </div>
 
-      {/* Toast */}
+      {/* Toast Notifications */}
       <ToastContainer position="top-center" autoClose={2000} />
     </div>
   );
