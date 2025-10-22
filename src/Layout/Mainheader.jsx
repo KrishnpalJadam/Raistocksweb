@@ -262,8 +262,8 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
       </button>
 
       {/* ✅ Help Popup (passes logged-in user's ID) */}
-      {showHelp && user && (
-        <HelpPopup onClose={() => setShowHelp(false)} userId={user._id} />
+      {showHelp && (
+        <HelpPopup onClose={() => setShowHelp(false)} />
       )}
     </>
   );

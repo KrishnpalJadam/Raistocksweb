@@ -1,15 +1,11 @@
-// src/components/HelpPopup.jsx
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  createSupportTicket,
-  resetSupportState,
-} from "../slices/supportSlice";
+import { createSupportTicket, resetSupportState } from "../slices/supportSlice";
 
 const HelpPopup = ({ onClose }) => {
   const dispatch = useDispatch();
   const { loading, success, error } = useSelector((state) => state.support);
-  const { client } = useSelector((state) => state.clientAuth); // ✅ get logged-in client
+  const { client } = useSelector((state) => state.clientAuth);
 
   const [formData, setFormData] = useState({
     category: "",
@@ -31,12 +27,11 @@ const HelpPopup = ({ onClose }) => {
       return;
     }
 
-    // ✅ Send request with logged-in client’s ID
     dispatch(
       createSupportTicket({
         category: formData.category,
         subject: formData.subject,
-        userId: client._id, // ✅ automatically included
+        userId: client._id,
       })
     );
   };
@@ -53,6 +48,8 @@ const HelpPopup = ({ onClose }) => {
     setShowConfirm(false);
     onClose();
   };
+
+  if (!showForm && !showConfirm) return null;
 
   return (
     <>
@@ -106,11 +103,7 @@ const HelpPopup = ({ onClose }) => {
                     />
                   </div>
 
-                  {loading && (
-                    <p className="text-muted text-center">
-                      Sending your request...
-                    </p>
-                  )}
+                  {loading && <p className="text-muted text-center">Sending your request...</p>}
                   {error && <p className="text-danger text-center">{error}</p>}
                 </div>
 
@@ -135,7 +128,7 @@ const HelpPopup = ({ onClose }) => {
               <div className="modal-body p-4">
                 <h5 className="mb-3 text-success">✅ Request Submitted Successfully</h5>
                 <p className="text-muted">
-                  Thank you for reaching out. Our support team has received your query and will get back to you within 24 hours via email.
+                  Thank you for reaching out. Our support team has received your query and will get back to you within 24 hours.
                 </p>
                 <button className="btn btn-success mt-2" onClick={handleCloseConfirm}>
                   OK
