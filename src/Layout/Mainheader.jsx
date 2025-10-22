@@ -1,16 +1,16 @@
 // src/components/Mainheader.jsx
 import React, { useState } from "react";
-import { Bell, User, Menu, X, LineChart } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
 import logo from "../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import HelpPopup from "./HelpPopup";
-import { useSelector, useDispatch } from "react-redux"; // ✅ import Redux hook
-import { logoutCRMUser } from "../slices/crmAuthSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { logoutClient } from "../slices/clientAuthSlice"; // ✅ use clientAuthSlice now
 
 const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.crmAuth); // ✅ get logged-in user from Redux
+  const { client } = useSelector((state) => state.clientAuth); // ✅ get logged-in client from Redux
   const [showHelp, setShowHelp] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
@@ -31,10 +31,11 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
     document.body.classList.toggle("dark-mode", !darkMode);
   };
 
+  // ✅ Logout Handler
   const handleLogout = async () => {
     try {
-      await dispatch(logoutCRMUser()).unwrap();
-      navigate("/");
+      await dispatch(logoutClient()).unwrap();
+      navigate("/"); // redirect to home/login
     } catch (error) {
       console.error("Failed to logout:", error);
     }
@@ -44,7 +45,6 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
     <>
       <header className="rai-dashboard-header">
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {/* Sidebar Toggle */}
           <button
             className="btn rai-dashboard-icon-btn d-lg-none"
             onClick={handleToggle}
@@ -53,7 +53,6 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
             <Menu className="text-dark" size={20} />
           </button>
 
-          {/* Logo */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span className="rai-dashboard-logo-text">
               <img src={logo} width={100} alt="Logo" />
@@ -61,7 +60,6 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
           </div>
         </div>
 
-        {/* Dashboard Title */}
         <div
           className="text-center d-none d-sm-block fs-4"
           onClick={homePage}
@@ -71,69 +69,6 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {/* 📩 Trade Dropdown */}
-          <div className="dropdown me-2" style={{ position: "relative" }}>
-            <button
-              className="btn btn-primary btn-sm d-flex align-items-center rounded-3 dropdown-toggle"
-              type="button"
-              id="tradeDropdown"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              📩
-            </button>
-            <span
-              className="badge bg-danger rounded-pill"
-              style={{
-                fontSize: 10,
-                position: "absolute",
-                top: -6,
-                right: -6,
-              }}
-            >
-              3
-            </span>
-
-            <ul
-              className="dropdown-menu dropdown-menu-end shadow-sm"
-              aria-labelledby="tradeDropdown"
-              style={{ fontSize: "0.9rem", minWidth: "230px" }}
-            >
-              <li className="dropdown-header fw-bold">Recent Trade</li>
-              <li>
-                <span className="dropdown-item text-wrap">
-                  🔹 Long Banklify at ₹233
-                </span>
-                <div className="dropdown-item text-wrap ml-3">
-                  <p className="ml-3">
-                    Entry Price : <span className="text-muted">233</span>
-                  </p>
-                </div>
-              </li>
-              <li>
-                <span className="dropdown-item text-wrap">
-                  🔹 New signal posted in Nifty section.
-                </span>
-                <div className="dropdown-item text-wrap ml-3">
-                  <p className="ml-3">
-                    Entry Price : <span className="text-muted">233</span>
-                  </p>
-                </div>
-              </li>
-              <li>
-                <hr className="dropdown-divider" />
-              </li>
-              <li>
-                <Link
-                  to="/customer/trade-recommendation"
-                  className="dropdown-item text-center text-primary fw-semibold"
-                >
-                  View all
-                </Link>
-              </li>
-            </ul>
-          </div>
-
           {/* 🔔 Notifications */}
           <div className="dropdown me-2" style={{ position: "relative" }}>
             <button
@@ -143,53 +78,14 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              🔔
+              <Bell size={18} />
             </button>
             <span
               className="badge bg-danger rounded-pill"
-              style={{
-                fontSize: 10,
-                position: "absolute",
-                top: -6,
-                right: -6,
-              }}
+              style={{ fontSize: 10, position: "absolute", top: -6, right: -6 }}
             >
               3
             </span>
-
-            <ul
-              className="dropdown-menu dropdown-menu-end shadow-sm"
-              aria-labelledby="notificationDropdown"
-              style={{ fontSize: "0.9rem", minWidth: "230px" }}
-            >
-              <li className="dropdown-header fw-bold">Notifications</li>
-              <li>
-                <span className="dropdown-item text-wrap">
-                  🔹 Trade "Banknifty CE" closed with profit.
-                </span>
-              </li>
-              <li>
-                <span className="dropdown-item text-wrap">
-                  🔹 New signal posted in Nifty section.
-                </span>
-              </li>
-              <li>
-                <span className="dropdown-item text-wrap">
-                  🔹 Reminder: Check your open positions.
-                </span>
-              </li>
-              <li>
-                <hr className="dropdown-divider" />
-              </li>
-              <li>
-                <a
-                  className="dropdown-item text-center text-primary fw-semibold"
-                  href="#"
-                >
-                  View all
-                </a>
-              </li>
-            </ul>
           </div>
 
           {/* 👤 Profile Dropdown */}
@@ -218,12 +114,12 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/"
+                <button
+                  onClick={handleLogout}
                   className="dropdown-item d-flex align-items-center text-danger"
                 >
                   <i className="bi bi-box-arrow-right me-2"></i> Logout
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -231,9 +127,7 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
           {/* ☀️ Dark/Light Toggle */}
           <button
             onClick={toggleDarkMode}
-            className={`btn btn-sm rounded-3 ${
-              darkMode ? "btn-dark" : "btn-light"
-            }`}
+            className={`btn btn-sm rounded-3 ${darkMode ? "btn-dark" : "btn-light"}`}
             title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
             {darkMode ? "🌙" : "☀️"}
@@ -241,7 +135,7 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
         </div>
       </header>
 
-      {/* ✅ Help Floating Button */}
+      {/* Help Floating Button */}
       <button
         onClick={() => setShowHelp(true)}
         className="btn btn-primary rounded-circle shadow-lg helppop"
@@ -261,10 +155,7 @@ const Mainheader = ({ isSidebarCollapsed, onToggleSidebar, onToggleMobileSidebar
         ❔
       </button>
 
-      {/* ✅ Help Popup (passes logged-in user's ID) */}
-      {showHelp && (
-        <HelpPopup onClose={() => setShowHelp(false)} />
-      )}
+      {showHelp && <HelpPopup onClose={() => setShowHelp(false)} />}
     </>
   );
 };

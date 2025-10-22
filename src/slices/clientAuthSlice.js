@@ -2,40 +2,49 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL; // adjust if needed
+axios.defaults.withCredentials = true; // 👈 ensures cookies are sent automatically
 
-// --- Login ---
+// ✅ Base API URL from environment variables (works with Vite)
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const loginClient = createAsyncThunk(
   "clientAuth/loginClient",
   async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/client/auth/login`, { email });
-      localStorage.setItem("clientToken", response.data.token);
-      localStorage.setItem("client", JSON.stringify(response.data.client));
-      return response.data.client;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || "Login failed. Please try again.");
+      const response = await axios.post(
+        `${API_URL}/client/auth/login`, // ✅ use env variable
+        { email },
+        { withCredentials: true }
+      );
+
+      return response.data.client; // ✅ only need the client data
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Login failed"
+      );
     }
   }
 );
 
-// --- Logout ---
-export const logoutClient = createAsyncThunk("clientAuth/logoutClient", async () => {
-  localStorage.removeItem("clientToken");
-  localStorage.removeItem("client");
-  return null;
-});
-
-const initialState = {
-  client: JSON.parse(localStorage.getItem("client")) || null,
-  token: localStorage.getItem("clientToken") || null,
-  loading: false,
-  error: null,
-};
+export const logoutClient = createAsyncThunk(
+  "clientAuth/logoutClient",
+  async (_, { rejectWithValue }) => {
+    try {
+      await axios.post(
+        `${API_URL}/client/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
+      return true;
+    } catch (error) {
+      return rejectWithValue("Logout failed");
+    }
+  }
+);
 
 const clientAuthSlice = createSlice({
   name: "clientAuth",
-  initialState,
+  initialState: { client: null, loading: false, error: null },
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -46,7 +55,6 @@ const clientAuthSlice = createSlice({
       .addCase(loginClient.fulfilled, (state, action) => {
         state.loading = false;
         state.client = action.payload;
-        state.error = null;
       })
       .addCase(loginClient.rejected, (state, action) => {
         state.loading = false;
@@ -54,7 +62,6 @@ const clientAuthSlice = createSlice({
       })
       .addCase(logoutClient.fulfilled, (state) => {
         state.client = null;
-        state.token = null;
       });
   },
 });
