@@ -208,15 +208,17 @@ const TradeRecommendation = () => {
   const { trades, loading } = useSelector((state) => state.trades);
 
   const [showFilter, setShowFilter] = useState(false);
-  const [activeTab, setActiveTab] = useState("Recent");
+  const [activeTab, setActiveTab] = useState("Closed");
 
   useEffect(() => {
     dispatch(fetchTrades());
   }, [dispatch]);
 
-  const filteredTrades = trades.filter((t) =>
-    activeTab === "Recent" ? t.status === "Closed" : t.status === "Live"
-  );
+  const filteredTrades = trades.filter((t) => {
+    if (!t || !t.status) return false;
+    const tradeStatus = t.status.toLowerCase();
+    return activeTab === "Closed" ? tradeStatus === "closed" : tradeStatus === "live";
+  });
 
   const getBorderClass = (trade) => {
     if (trade.status === "Live") return "trade-card live-border";
@@ -242,10 +244,10 @@ const TradeRecommendation = () => {
       {/* Tabs */}
       <div className="trade-tabs">
         <button
-          className={`tab-btn ${activeTab === "Recent" ? "active" : ""}`}
-          onClick={() => setActiveTab("Recent")}
+          className={`tab-btn ${activeTab === "Closed" ? "active" : ""}`}
+          onClick={() => setActiveTab("Closed")}
         >
-          Recent Trades
+          Closed Trades
         </button>
         <button
           className={`tab-btn ${activeTab === "Live" ? "active" : ""}`}

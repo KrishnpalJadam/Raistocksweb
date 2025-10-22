@@ -5,15 +5,19 @@ import { TrendingUp, DollarSign, IndianRupee, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Map sentiment to class
-const statusMap = {
-  positive: "rai-comment-positive",
-  negative: "rai-comment-negative",
-  neutral: "text-muted",
+const getCommentClass = (sentiment) => {
+  if (!sentiment) return "text-muted";
+  const normalizedSentiment = sentiment.toLowerCase();
+  return normalizedSentiment === "positive"
+    ? "text-success"
+    : normalizedSentiment === "negative"
+    ? "text-danger"
+    : "text-muted";
 };
 
 // Card Component
 const MarketInsightCard = ({ title, value, comment, date, sentiment }) => {
-  const CommentClass = statusMap[sentiment] || "text-muted";
+  const commentClass = getCommentClass(sentiment);
 
   return (
     <div className="rai-card card">
@@ -34,13 +38,17 @@ const MarketInsightCard = ({ title, value, comment, date, sentiment }) => {
         </p>
 
         <p
-          className={`card-text text-muted small ${CommentClass}`}
+          className={`card-text small ${commentClass}`}
           style={{ fontSize: "12px" }}
         >
           {comment || ""}
         </p>
 
-        {date && <p className="rai-date-small mb-0">*As of: {new Date(date).toLocaleDateString()}</p>}
+        {date && (
+          <p className="rai-date-small mb-0">
+            *As of: {new Date(date).toLocaleDateString()}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -48,7 +56,9 @@ const MarketInsightCard = ({ title, value, comment, date, sentiment }) => {
 
 const MarketInsight = () => {
   const dispatch = useDispatch();
-  const { insights, loading, error } = useSelector((state) => state.marketInsight);
+  const { insights, loading, error } = useSelector(
+    (state) => state.marketInsight
+  );
 
   useEffect(() => {
     dispatch(fetchMarketInsights());
@@ -73,21 +83,19 @@ const MarketInsight = () => {
       {error && <p className="text-danger">{error}</p>}
 
       <div className="row">
-        {insights && insights.length > 0 ? (
-          insights.map((item, index) => (
-            <div key={index} className="col-12 col-md-6 col-lg-4">
-              <MarketInsightCard
-                title={item.title}
-                value={item.marketInfo}
-                comment={item.comment}
-                date={item.date}
-                sentiment={item.sentiment}
-              />
-            </div>
-          ))
-        ) : (
-          !loading && <p>No market insights available.</p>
-        )}
+        {insights && insights.length > 0
+          ? insights.map((item, index) => (
+              <div key={index} className="col-12 col-md-6 col-lg-4">
+                <MarketInsightCard
+                  title={item.title}
+                  value={item.marketInfo}
+                  comment={item.comment}
+                  date={item.date}
+                  sentiment={item.sentiment}
+                />
+              </div>
+            ))
+          : !loading && <p>No market insights available.</p>}
       </div>
 
       <button
