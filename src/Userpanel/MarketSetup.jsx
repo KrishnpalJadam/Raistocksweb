@@ -3,8 +3,8 @@
 
 
 // MarketSetup.jsx
-import React, { useEffect, useRef } from "react";
 import { Target, Scale, TrendingUp, TrendingDown, BookOpen, X } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 // import Chart from "chart.js/auto";
 import { GaugeController, Needle } from "chartjs-gauge"; // ✅ Important import
@@ -16,48 +16,48 @@ const MarketSetup = () => {
   useEffect(() => {
 
 
-const data = [25, 25, 25, 25]; // 4 segments 25% each
-const config = {
-  type: "gauge",
-  data: {
-    datasets: [
-      {
-        value: 44.44, // needle position
-        minValue: 0,
-        data: [100], // total gauge span
-        valueColorStops: [
-          [0.0, "#8B0000"],  // Fear
-          [0.25, "#FF6347"], // Accumulation
-          [0.5, "#90EE90"],  // Distribution
-          [0.75, "#006400"], // Greed
-          [1.0, "#006400"]
+    const data = [25, 25, 25, 25]; // 4 segments 25% each
+    const config = {
+      type: "gauge",
+      data: {
+        datasets: [
+          {
+            value: 44.44, // needle position
+            minValue: 0,
+            data: [100], // total gauge span
+            valueColorStops: [
+              [0.0, "#8B0000"],  // Fear
+              [0.25, "#FF6347"], // Accumulation
+              [0.5, "#90EE90"],  // Distribution
+              [0.75, "#006400"], // Greed
+              [1.0, "#006400"]
+            ],
+            borderWidth: 1,
+          },
         ],
-        borderWidth: 1,
       },
-    ],
-  },
-  options: {
-    responsive: true,
-    layout: { padding: { bottom: 20 } },
-    needle: {
-      radiusPercentage: 2,
-      widthPercentage: 3.2,
-      lengthPercentage: 80,
-      color: "#000",
-    },
-    valueLabel: { display: false },
-    plugins: {
-      legend: { display: false },
-      title: { display: true, text: "Market Phase Meter" },
-    },
-  },
-};
+      options: {
+        responsive: true,
+        layout: { padding: { bottom: 20 } },
+        needle: {
+          radiusPercentage: 2,
+          widthPercentage: 3.2,
+          lengthPercentage: 80,
+          color: "#000",
+        },
+        valueLabel: { display: false },
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: "Market Phase Meter" },
+        },
+      },
+    };
 
 
 
-const ctx = chartRef.current.getContext('2d');
-window.myGauge = new Chart(ctx, config);
- 
+    const ctx = chartRef.current.getContext('2d');
+    window.myGauge = new Chart(ctx, config);
+
 
     // Cleanup
     return () => {
@@ -66,17 +66,25 @@ window.myGauge = new Chart(ctx, config);
       }
     };
   }, []);
+  const [activeStep, setActiveStep] = useState(1);
 
+  const steps = [
+    { id: 1, label: "STEP 1", color: "bg-orange-400" },
+    { id: 2, label: "STEP 2", color: "bg-orange-500" },
+    { id: 3, label: "STEP 3", color: "bg-red-500" },
+    { id: 4, label: "STEP 4", color: "bg-pink-500" },
+    { id: 5, label: "STEP 5", color: "bg-purple-500" },
+  ];
   // --- DUMMY MARKET SETUP DATA ---
   const dummySetupData = {
     keyLevels: {
       support: [
-        { level: "24,500 - 24,550", comment: "Major support zone, breakdown could trigger correction." },
+        { level: "24,500", comment: "Major support zone, breakdown could trigger correction." },
         { level: "24,300", comment: "Short-term crucial support; bias turns weak below this." },
         { level: "23,800", comment: "Strong cushion for the medium-term trend." },
       ],
       resistance: [
-        { level: "25,000 - 25,050", comment: "Immediate hurdle; sustained closing above this is bullish." },
+        { level: "25,000", comment: "Immediate hurdle; sustained closing above this is bullish." },
         { level: "25,200", comment: "Ultimate barrier; new uptrend starts upon breach." },
         { level: "25,350", comment: "Upper band of channel." },
       ],
@@ -97,24 +105,7 @@ window.myGauge = new Chart(ctx, config);
         comment: "Shows market indecision at high levels — caution advised.",
       },
     ],
-    events: [
-      {
-        title: "Breakdown Event",
-        icon: TrendingDown,
-        name: "Bank Nifty Breakdown",
-        status: "Confirmed Breakdown",
-        price: "Below 54,000",
-        comment: "Breakdown below key support suggests weakness in financial sector.",
-      },
-      {
-        title: "Retest Confirmation",
-        icon: TrendingUp,
-        name: "Midcap Index Retest",
-        status: "Retest Successful",
-        price: "At 42,100",
-        comment: "Midcap index retested previous breakout zone — strength confirmed.",
-      },
-    ],
+
   };
 
   const SetupCard = ({ title, icon: Icon, name, status, price, comment }) => (
@@ -128,7 +119,7 @@ window.myGauge = new Chart(ctx, config);
         </div>
         <h5 className="fw-bold mb-1">{name}</h5>
         {price && <p className="text-muted small mb-1">Price Action: {price}</p>}
-        <p className="small fw-semibold text-primary mb-1">Status: {status}</p>
+
         <p className="small text-secondary mb-0">{comment}</p>
       </div>
     </div>
@@ -196,57 +187,83 @@ window.myGauge = new Chart(ctx, config);
       </div>
 
       {/* --- Support & Resistance --- */}
-      <div className="row mb-4">
-        <div className="col-6 mb-3">
-          <div className="card border-primary shadow-sm h-100">
-            <div className="card-header bg-primary text-white fw-bold d-flex align-items-center">
-              <Target size={18} className="me-2" /> Key Resistance Levels
+      <div className="card border-primary mb-4">
+
+
+        <div className="row mb-4">
+
+
+          <div className="col-6 mb-3">
+            <div className="card border-success shadow-sm h-100">
+              <div className="card-header bg-success text-white fw-bold d-flex align-items-center">
+                <Target size={18} className="me-2" /> Key Support Levels
+              </div>
+              <ul className="list-group list-group-flush">
+                {dummySetupData.keyLevels.support.map((item, i) => (
+                  <li key={`S-${i}`} className="list-group-item small">
+                    <span className="fw-semibold text-primary me-2">{item.level}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="list-group list-group-flush">
-              {dummySetupData.keyLevels.resistance.map((item, i) => (
-                <li key={`R-${i}`} className="list-group-item small">
-                  <span className="fw-semibold text-primary me-2">{item.level}</span>
-                </li>
-              ))}
-            </ul>
+          </div>
+          <div className="col-6 mb-3">
+            <div className="card border-danger shadow-sm h-100">
+              <div className="card-header bg-danger text-white fw-bold d-flex align-items-center">
+                <Target size={18} className="me-2" /> Key Resistance Levels
+              </div>
+              <ul className="list-group list-group-flush">
+                {dummySetupData.keyLevels.resistance.map((item, i) => (
+                  <li key={`R-${i}`} className="list-group-item small">
+                    <span className="fw-semibold text-primary me-2">{item.level}</span>
+                  </li>
+                ))}
+              </ul>
+
+            </div>
 
           </div>
-         
-        </div>
+          <div className="p-3">
 
-        <div className="col-6 mb-3">
-          <div className="card border-primary shadow-sm h-100">
-            <div className="card-header bg-primary text-white fw-bold d-flex align-items-center">
-              <Target size={18} className="me-2" /> Key Support Levels
+
+            <div className="bg-light p-3" style={{ width: "100%", height: "100px" }}>
+              Comment here
             </div>
-            <ul className="list-group list-group-flush">
-              {dummySetupData.keyLevels.support.map((item, i) => (
-                <li key={`S-${i}`} className="list-group-item small">
-                  <span className="fw-semibold text-primary me-2">{item.level}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
-         <div>
-            <textarea name="" className="form-input" id=""></textarea>
-          </div>
       </div>
-
       {/* --- Patterns & Events --- */}
       <div className="row">
-        {dummySetupData.patterns.concat(dummySetupData.events).map((item, i) => (
-          <div className="col-12 col-md-6 col-lg-3" key={i}>
+        {dummySetupData.patterns.map((item, i) => (
+          <div className="col-12 col-md-6 col-lg-6" key={i}>
             <SetupCard {...item} />
           </div>
         ))}
       </div>
+      <div className="bg-white card border-primary mt-4">
+        <div className="">
+          <div className="steps p-3">
+            <div className="step step1">Formation</div>
+            <div className="step step2">Breakout</div>
+            <div className="step step3">Retest</div>
+
+          </div>
+          <div className="p-3">
+
+
+            <div className="bg-light p-3" style={{ width: "100%", height: "100px" }}>
+              Comment here
+            </div>
+          </div>
+        </div>
+      </div>
+
 
       <div>
         <button className="btn btn-primary mt-3">
-  See Image
+          See Image
         </button>
-      
+
       </div>
     </div>
   );
