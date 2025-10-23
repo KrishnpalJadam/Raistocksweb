@@ -22,26 +22,39 @@ export const fetchMarketPhases = createAsyncThunk(
 const marketPhaseSlice = createSlice({
   name: "marketPhase",
   initialState: {
-    marketPhases: [],
+    marketPhases: [
+      {
+        id: 1,
+        title: "Greed/Euphoria",
+        description: "The market is in a state of extreme optimism, with prices reaching new highs.",
+        date: "2024-07-26T10:00:00Z",
+      },
+      {
+        id: 2,
+        title: "Fear/Panic",
+        description: "The market is in a state of extreme pessimism, with prices falling sharply.",
+        date: "2024-07-25T10:00:00Z",
+      },
+    ],
     loading: false,
     error: null,
   },
   reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchMarketPhases.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchMarketPhases.fulfilled, (state, action) => {
-        state.loading = false;
-        state.marketPhases = action.payload;
-      })
-      .addCase(fetchMarketPhases.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
-  },
+  // extraReducers: (builder) => {
+  //   builder
+  //     .addCase(fetchMarketPhases.pending, (state) => {
+  //       state.loading = true;
+  //       state.error = null;
+  //     })
+  //     .addCase(fetchMarketPhases.fulfilled, (state, action) => {
+  //       state.loading = false;
+  //       state.marketPhases = action.payload;
+  //     })
+  //     .addCase(fetchMarketPhases.rejected, (state, action) => {
+  //       state.loading = false;
+  //       state.error = action.payload;
+  //     });
+  // },
 });
 
 export default marketPhaseSlice.reducer;
