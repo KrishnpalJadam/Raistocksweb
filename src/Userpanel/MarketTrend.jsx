@@ -39,7 +39,7 @@ const MarketTrend = () => {
 
       <div className="row g-3">
         {trends.map((trend) => {
-          const { _id, title = "", description = "", date = "" } = trend;
+          const { _id, title = "", description = "", date = "", brief, risk, target1, target2, target3 } = trend;
           const trendInfo = trendStatusMap[title] || { color: "#6c757d", icon: LineChart };
           const Icon = trendInfo.icon;
 
