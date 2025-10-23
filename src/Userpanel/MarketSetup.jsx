@@ -105,7 +105,7 @@ const MarketSetup = () => {
         comment: "Shows market indecision at high levels — caution advised.",
       },
     ],
- 
+
   };
 
   const SetupCard = ({ title, icon: Icon, name, status, price, comment }) => (
@@ -187,10 +187,10 @@ const MarketSetup = () => {
       </div>
 
       {/* --- Support & Resistance --- */}
-      <div className="">
+      <div className="card border-primary mb-4">
 
 
-        <div className="row mb-4 bg-white p-3">
+        <div className="row mb-4">
 
 
           <div className="col-6 mb-3">
@@ -240,19 +240,24 @@ const MarketSetup = () => {
           </div>
         ))}
       </div>
+      <div className="bg-white card border-primary mt-4">
+        <div className="">
+          <div className="steps p-3">
+            <div className="step step1">Formation</div>
+            <div className="step step2">Breakout</div>
+            <div className="step step3">Retest</div>
 
-<div className="steps-container">
-  <div className="steps">
-    <div className="step step1">STEP 1</div>
-    <div className="step step2">STEP 2</div>
-    <div className="step step3">STEP 3</div>
-    <div className="step step4">STEP 4</div>
-    <div className="step step5">STEP 5</div>
-  </div>
-  <div className="step-comment">
-    <p>👉 You are currently on STEP 1</p>
-  </div>
-</div>
+          </div>
+          <div className="p-3">
+
+
+            <div className="bg-light p-3" style={{ width: "100%", height: "100px" }}>
+              Comment here
+            </div>
+          </div>
+        </div>
+      </div>
+
 
       <div>
         <button className="btn btn-primary mt-3">
