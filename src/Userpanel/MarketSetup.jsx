@@ -1,20 +1,40 @@
-
-
-
-
 // MarketSetup.jsx
 import { Target, Scale, TrendingUp, TrendingDown, BookOpen, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchMarketSetups } from "../slices/marketSetupSlice";
+
 // import Chart from "chart.js/auto";
 import { GaugeController, Needle } from "chartjs-gauge"; // ✅ Important import
-
 
 const MarketSetup = () => {
   const chartRef = useRef(null);
 
-  useEffect(() => {
+  const [marketSetup, setMarketSetup] = useState(null); // ✅ Correct place
+  const [activeStep, setActiveStep] = useState(1);
+  const [showImagePopup, setShowImagePopup] = useState(false);
+  const { setups, loading, error } = useSelector((state) => state.marketSetup);
+  const dispatch = useDispatch();
 
+  // Get the latest setup (first in the array)
+  const currentSetup = setups[0] || {
+    on: "",
+    price: 0,
+    supportLevels: [],
+    resistanceLevels: [],
+    supportResistanceComment: "",
+    phase: "",
+    phaseComment: "",
+    trend: "",
+    trendComment: "",
+    chartPattern: "",
+    chartPatternComment: "",
+    candlePattern: "",
+    candlePatternComment: "",
+    breakoutEvents: [], // Array of { formation: String, eventComment: String }
+    imageUrl: "",
+  };
 
     const data = [25, 25, 25, 25]; // 4 segments 25% each
     const config = {
@@ -54,16 +74,34 @@ const MarketSetup = () => {
     };
 
 
+  useEffect(() => {
+    // Fetch market setups when component mounts
+    dispatch(fetchMarketSetups())
+      .unwrap()
+      .then((data) => {
+        console.log("Fetched market setups:", data);
+      })
+      .catch((error) => {
+        console.error("Error fetching market setups:", error);
+      });
+  }, [dispatch]);
+
+  // Set the marketSetup state when setups are loaded
+  useEffect(() => {
+    if (setups.length > 0) {
+      setMarketSetup(setups[0]);
+    }
+  }, [setups]);
 
     const ctx = chartRef.current.getContext('2d');
     window.myGauge = new Chart(ctx, config);
 
 
-    // Cleanup
-    return () => {
-      if (window.myGauge) {
-        window.myGauge.destroy();
-      }
+    const colorMap = {
+      Fear: "#8B0000",
+      Accumulation: "#FF6347",
+      Distribution: "#90EE90",
+      Greed: "#006400",
     };
   }, []);
   const [activeStep, setActiveStep] = useState(1);
@@ -143,47 +181,76 @@ const MarketSetup = () => {
         <div className="row mb-3">
           <div className="col-6 text-center">
             <div className="market-meter-box bg-light border rounded py-2 fw-bold">
-              BankNifty Spot – 56,850
+              {marketSetup?.on} - {marketSetup?.price}
             </div>
           </div>
           <div className="col-6 text-center">
             <div className="market-meter-box bg-light border rounded py-2 fw-bold text-success">
-              Trend – Bullish
+              Trend – {marketSetup?.trend}
             </div>
           </div>
         </div>
-        <div className="text-center" style={{ width: "300px", marginLeft: "auto", marginRight: "auto" }}>
+
+        <div
+          className="text-center"
+          style={{ width: "300px", margin: "0 auto" }}
+        >
           <canvas ref={chartRef} width="300" height="150"></canvas>
-          <div className="mt-2 fw-bold text-success fs-6">Current Phase: Greed</div>
-
-
+          <div className="mt-2 fw-bold fs-6">
+            Current Phase: {marketSetup?.phase}
+          </div>
         </div>
+
         <div className="d-flex justify-content-end colorbox mt-2 gap-3">
           {/* Fear */}
           <div className="d-flex align-items-center gap-1">
-            <div style={{ width: "12px", height: "12px", backgroundColor: "#8B0000", borderRadius: "2px" }}></div>
+            <div
+              style={{
+                width: "12px",
+                height: "12px",
+                backgroundColor: "#8B0000",
+                borderRadius: "2px",
+              }}
+            ></div>
             <small className="text-muted">Fear</small>
           </div>
-
           {/* Accumulation */}
           <div className="d-flex align-items-center gap-1">
-            <div style={{ width: "12px", height: "12px", backgroundColor: "#FF6347", borderRadius: "2px" }}></div>
+            <div
+              style={{
+                width: "12px",
+                height: "12px",
+                backgroundColor: "#FF6347",
+                borderRadius: "2px",
+              }}
+            ></div>
             <small className="text-muted">Accumulation</small>
           </div>
-
           {/* Distribution */}
           <div className="d-flex align-items-center gap-1">
-            <div style={{ width: "12px", height: "12px", backgroundColor: "#90EE90", borderRadius: "2px" }}></div>
+            <div
+              style={{
+                width: "12px",
+                height: "12px",
+                backgroundColor: "#90EE90",
+                borderRadius: "2px",
+              }}
+            ></div>
             <small className="text-muted">Distribution</small>
           </div>
-
           {/* Greed */}
           <div className="d-flex align-items-center gap-1">
-            <div style={{ width: "12px", height: "12px", backgroundColor: "#006400", borderRadius: "2px" }}></div>
+            <div
+              style={{
+                width: "12px",
+                height: "12px",
+                backgroundColor: "#006400",
+                borderRadius: "2px",
+              }}
+            ></div>
             <small className="text-muted">Greed</small>
           </div>
         </div>
-
       </div>
 
       {/* --- Support & Resistance --- */}
@@ -222,6 +289,23 @@ const MarketSetup = () => {
 
             </div>
 
+          {/* Resistance Levels */}
+          <div className="col-6 mb-3">
+            <div className="card border-danger shadow-sm h-100">
+              <div className="card-header bg-danger text-white fw-bold d-flex align-items-center">
+                <Target size={18} className="me-2" /> Key Resistance Levels
+              </div>
+              <ul className="list-group list-group-flush">
+                {currentSetup.resistanceLevels &&
+                  currentSetup.resistanceLevels.map((level, i) => (
+                    <li key={`R-${i}`} className="list-group-item small">
+                      <span className="fw-semibold text-primary me-2">
+                        {level.toLocaleString()}
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            </div>
           </div>
           <div className="p-3">
 
@@ -238,7 +322,7 @@ const MarketSetup = () => {
           <div className="col-12 col-md-6 col-lg-6" key={i}>
             <SetupCard {...item} />
           </div>
-        ))}
+        </div>
       </div>
       <div className="bg-white card border-primary mt-4">
         <div className="">
@@ -259,17 +343,59 @@ const MarketSetup = () => {
       </div>
 
 
+      {/* Image Button and Popup */}
       <div>
         <button className="btn btn-primary mt-3">
           See Image
         </button>
 
       </div>
+
+      {/* Image Popup */}
+      {showImagePopup && (
+        <div
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+          style={{
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 1050,
+          }}
+          onClick={() => setShowImagePopup(false)}
+        >
+          <div
+            className="bg-white p-3 rounded position-relative"
+            style={{ maxWidth: "90%", maxHeight: "90vh" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="btn-close position-absolute top-0 end-0 m-2"
+              onClick={() => setShowImagePopup(false)}
+            />
+            <div className="text-center">
+              {currentSetup.imageUrl ? (
+                <img
+                  src={`http://localhost:5000${currentSetup.imageUrl}`}
+                  alt="Market Setup"
+                  className="img-fluid"
+                  style={{ maxHeight: "80vh" }}
+                  onError={(e) => {
+                    console.error(
+                      "Image failed to load:",
+                      currentSetup.imageUrl
+                    );
+                    e.target.onerror = null;
+                    e.target.src =
+                      "https://via.placeholder.com/400x300?text=Image+Not+Found";
+                  }}
+                />
+              ) : (
+                <div className="p-4 text-muted">No image available</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default MarketSetup;
-
-
-

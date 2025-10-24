@@ -400,6 +400,16 @@ body.dark-mode .card {
   border-color: #2a2a2a !important;
 }
 
+.rai-card-negative{
+  border-color:#dc3545;
+}
+.rai-card-positive{
+  border-color:#28a745;
+}
+.rai-card-neutral{
+  border-color:#dee2e6;
+}
+
 /* Card text overrides */
 body.dark-mode .card-text,
 body.dark-mode p,

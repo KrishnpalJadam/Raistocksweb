@@ -1,19 +1,23 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchMarketInsights } from "../slices/marketInsightSlice";
-import { TrendingUp, DollarSign, IndianRupee, X } from "lucide-react";
+import { TrendingUp, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
-// Map sentiment to class
-const statusMap = {
-  positive: "rai-comment-positive",
-  negative: "rai-comment-negative",
-  neutral: "text-muted",
+// ========== Helper: Sentiment to Class ==========
+const getCommentClass = (sentiment) => {
+  if (!sentiment) return "text-muted";
+  const normalizedSentiment = sentiment.toLowerCase();
+  return normalizedSentiment === "positive"
+    ? "text-success"
+    : normalizedSentiment === "negative"
+    ? "text-danger"
+    : "text-muted";
 };
 
-// Card Component
+// ========== Card Component ==========
 const MarketInsightCard = ({ title, value, comment, date, sentiment }) => {
-  const CommentClass = statusMap[sentiment] || "text-muted";
+  const commentClass = getCommentClass(sentiment);
 
   return (
     <div className="rai-card card">
@@ -33,26 +37,70 @@ const MarketInsightCard = ({ title, value, comment, date, sentiment }) => {
           {value || ""}
         </p>
 
-        <p
-          className={`card-text text-muted small ${CommentClass}`}
-          style={{ fontSize: "12px" }}
-        >
+        <p className={`card-text small ${commentClass}`} style={{ fontSize: "12px" }}>
           {comment || ""}
         </p>
 
-        {date && <p className="rai-date-small mb-0">*As of: {new Date(date).toLocaleDateString()}</p>}
+        {date && (
+          <p className="rai-date-small mb-0">
+            *As of: {new Date(date).toLocaleDateString()}
+          </p>
+        )}
       </div>
     </div>
   );
 };
 
+// ========== Main Component ==========
 const MarketInsight = () => {
   const dispatch = useDispatch();
   const { insights, loading, error } = useSelector((state) => state.marketInsight);
+  const [daysToShow, setDaysToShow] = useState(1); // Start with current day
 
   useEffect(() => {
     dispatch(fetchMarketInsights());
   }, [dispatch]);
+
+  // ✅ Clean + valid insights
+const validInsights = insights.filter(
+  (item) =>
+    item &&
+    (item.title || item.marketInfo || item.comment || item.sentiment)
+);
+
+  // ✅ Group insights by date (YYYY-MM-DD)
+  const groupedInsights = useMemo(() => {
+    const groups = {};
+    validInsights.forEach((item) => {
+      const dateKey = new Date(item.date).toISOString().split("T")[0];
+      if (!groups[dateKey]) groups[dateKey] = [];
+      groups[dateKey].push(item);
+    });
+    return groups;
+  }, [validInsights]);
+
+  // ✅ Generate an array of last 15 days (including today)
+  const recentDates = useMemo(() => {
+    const arr = [];
+    const today = new Date();
+    for (let i = 0; i < 15; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      arr.push(d.toISOString().split("T")[0]);
+    }
+    return arr; // [today, yesterday, ... up to 14 days ago]
+  }, []);
+
+  // ✅ Determine which dates to show (based on clicks)
+  const visibleDates = recentDates.slice(0, daysToShow);
+
+  // ✅ Combine trades for only visible days
+  const visibleInsights = visibleDates.flatMap((dateKey) => groupedInsights[dateKey] || []);
+
+  // ✅ Handle Show More
+  const handleShowMore = () => {
+    if (daysToShow < 15) setDaysToShow(daysToShow + 1);
+  };
 
   return (
     <div className="rai-module-content">
@@ -72,35 +120,56 @@ const MarketInsight = () => {
       {loading && <p>Loading market insights...</p>}
       {error && <p className="text-danger">{error}</p>}
 
-      <div className="row">
-        {insights && insights.length > 0 ? (
-          insights.map((item, index) => (
-            <div key={index} className="col-12 col-md-6 col-lg-4">
-              <MarketInsightCard
-                title={item.title}
-                value={item.marketInfo}
-                comment={item.comment}
-                date={item.date}
-                sentiment={item.sentiment}
-              />
-            </div>
-          ))
-        ) : (
-          !loading && <p>No market insights available.</p>
-        )}
-      </div>
+      {!loading && visibleInsights.length === 0 && (
+        <p>No insights found for the selected days.</p>
+      )}
 
-      <button
-        className="btn btn-primary mt-4"
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginLeft: "auto",
-          marginRight: "auto",
-        }}
-      >
-        Show More
-      </button>
+      {/* ✅ Grouped by Date */}
+      {visibleDates.map((dateKey) => {
+        const items = groupedInsights[dateKey] || [];
+        if (items.length === 0) return null;
+        return (
+          <div key={dateKey} className="mb-4">
+            <h6 className="fw-bold text-primary mb-3">
+              {new Date(dateKey).toLocaleDateString(undefined, {
+                weekday: "long",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </h6>
+            <div className="row">
+              {items.map((item, index) => (
+                <div key={index} className="col-12 col-md-6 col-lg-4 mb-3">
+                  <MarketInsightCard
+                    title={item.title}
+                    value={item.marketInfo}
+                    comment={item.comment}
+                    date={item.date}
+                    sentiment={item.sentiment}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      {/* ✅ Show More Button */}
+      {daysToShow < 15 && visibleInsights.length > 0 && (
+        <button
+          className="btn btn-primary mt-4"
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
+          onClick={handleShowMore}
+        >
+          Show More
+        </button>
+      )}
     </div>
   );
 };

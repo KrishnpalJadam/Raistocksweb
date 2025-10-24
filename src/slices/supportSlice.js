@@ -2,19 +2,22 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+  const API_URL = import.meta.env.VITE_API_URL; 
+
+
 // ✅ Async thunk for creating a new support ticket
 // src/slices/supportSlice.js
 export const createSupportTicket = createAsyncThunk(
   "support/createTicket",
   async ({ category, subject, userId }, { rejectWithValue }) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/support", {
+      const response = await axios.post(`${API_URL}/api/support`, {
         client: "User",
         category,
         subject,
         opened: new Date(),
         status: "Open",
-        userId, // ✅ correct field passed from frontend
+        userId,
       });
       return response.data;
     } catch (err) {
@@ -22,6 +25,7 @@ export const createSupportTicket = createAsyncThunk(
     }
   }
 );
+
 
 const supportSlice = createSlice({
   name: "support",

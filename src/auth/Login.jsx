@@ -17,32 +17,34 @@ const Login = ({ show, onClose }) => {
   // ✅ Correct slice reference
   const { client, loading, error } = useSelector((state) => state.clientAuth);
 
-  useEffect(() => {
-    // ✅ If login successful → close modal + navigate
-    if (client) {
+useEffect(() => {
+  if (client) {
+    toast.success("Login successful!🎉");
+    setTimeout(() => {
       onClose();
       navigate("/customer/dashboard");
-    }
-  }, [client, navigate, onClose]);
+    }, 1500);
+  }
+}, [client, navigate, onClose]);
 
   // ✅ Hide modal if not visible
   if (!show) return null;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!email) {
-      toast.error("Please enter your email");
-      return;
-    }
+  if (!email) {
+    toast.error("Please enter your email");
+    return;
+  }
 
-    try {
-      await dispatch(loginClient({ email })).unwrap();
-      toast.success("Login successful!");
-    } catch (err) {
-      toast.error(err || "Invalid email");
-    }
-  };
+  try {
+    await dispatch(loginClient({ email })).unwrap();
+    // ❌ remove toast.success here
+  } catch (err) {
+    toast.error(err || "Invalid email");
+  }
+};
 
   return (
     <div className="rai-login-modal">
