@@ -34,7 +34,7 @@ export const addTradeDiaryEntry = createAsyncThunk(
   "tradeLogs/add",
   async (entryData, { getState, rejectWithValue }) => {
     try {
-      const userId = getState().crmAuth.user?.data?.id;
+const userId = getState().clientAuth.client?._id || getState().clientAuth.client?.id;
       if (!userId) throw new Error("User not logged in");
 
       // ✅ Must send crmUser (not user_id)
@@ -62,7 +62,7 @@ export const updateTradeDiaryEntry = createAsyncThunk(
   "tradeLogs/update",
   async ({ id, data }, { getState, rejectWithValue }) => {
     try {
-      const userId = getState().crmAuth.user?.data?.id;
+const userId = getState().clientAuth.client?._id || getState().clientAuth.client?.id;
       if (!userId) throw new Error("User not logged in");
 
       const updatedData = { ...data, crmUser: userId };

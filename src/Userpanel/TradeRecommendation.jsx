@@ -359,6 +359,11 @@ const TradeRecommendation = () => {
                 >
                   {trade.result === "Profit" ? "▲" : "▼"} ₹
                   {Math.abs(trade.pnl || 0).toLocaleString()}
+                  {(() => {
+                    const lotSize = parseInt(trade.lotSize) || 0;
+                    const entryPrice = parseFloat(trade.entryPrice) || 0;
+                    return (lotSize * entryPrice).toLocaleString("en-IN");
+                  })()}
                 </div>
               )}
               {trade.status === "Live" && (

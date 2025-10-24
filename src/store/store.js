@@ -10,6 +10,8 @@ import userTradeFormReducer from "../slices/userTradeFormSlice";
 import tradeLogReducer from "../slices/tradeLogSlice";
 import supportReducer from "../slices/supportSlice";
 import clientAuthReducer from "../slices/clientAuthSlice";
+import tradeSetupReducer from "../slices/tradeSetupSlice";
+import marketSetupReducer from "../slices/marketSetupSlice";
 
 const appReducer = combineReducers({
   crmAuth: crmAuthReducer,
@@ -23,6 +25,10 @@ const appReducer = combineReducers({
   tradeLogs: tradeLogReducer,
   support: supportReducer,
   clientAuth: clientAuthReducer, 
+      tradeSetup: tradeSetupReducer,
+          marketSetup: marketSetupReducer,
+
+
 });
 
 const rootReducer = (state, action) => {

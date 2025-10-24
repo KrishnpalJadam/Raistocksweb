@@ -14,7 +14,13 @@ export const fetchTradeActions = createAsyncThunk(
       }
 
       const data = await res.json();
-      return data;
+
+      // ✅ Normalize: always return an array
+      return Array.isArray(data)
+        ? data
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -43,9 +49,14 @@ const tradeActionsSlice = createSlice({
       })
       .addCase(fetchTradeActions.fulfilled, (state, action) => {
         state.loading = false;
-        // Add new actions to the existing ones, avoiding duplicates by ID
+
+        const payloadArray = Array.isArray(action.payload)
+          ? action.payload
+          : [];
+
+        // ✅ Avoid duplicates
         const existingIds = new Set(state.actions.map((a) => a._id || a.id));
-        const newActions = action.payload.filter(
+        const newActions = payloadArray.filter(
           (a) => !existingIds.has(a._id || a.id)
         );
         state.actions = [...state.actions, ...newActions];

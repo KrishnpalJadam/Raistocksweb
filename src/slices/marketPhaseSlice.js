@@ -40,21 +40,21 @@ const marketPhaseSlice = createSlice({
     error: null,
   },
   reducers: {},
-  // extraReducers: (builder) => {
-  //   builder
-  //     .addCase(fetchMarketPhases.pending, (state) => {
-  //       state.loading = true;
-  //       state.error = null;
-  //     })
-  //     .addCase(fetchMarketPhases.fulfilled, (state, action) => {
-  //       state.loading = false;
-  //       state.marketPhases = action.payload;
-  //     })
-  //     .addCase(fetchMarketPhases.rejected, (state, action) => {
-  //       state.loading = false;
-  //       state.error = action.payload;
-  //     });
-  // },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchMarketPhases.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchMarketPhases.fulfilled, (state, action) => {
+        state.loading = false;
+        state.marketPhases = action.payload;
+      })
+      .addCase(fetchMarketPhases.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
 });
 
 export default marketPhaseSlice.reducer;

@@ -24,10 +24,10 @@ const TradeTable = ({ title, data = [], isLive = false, onRowClick }) => {
           <thead className="table-light">
             <tr>
               <th style={{ minWidth: 100 }}>Date</th>
-              <th style={{ minWidth: 120 }}>Stock</th>
-              <th style={{ minWidth: 180 }}>Index Option</th>
-              <th style={{ minWidth: 100 }}>Intraday</th>
+              <th style={{ minWidth: 120 }}>Segment</th>
+              <th style={{ minWidth: 100 }}>Trade Type</th>
               <th style={{ minWidth: 100 }}>Action</th>
+              <th style={{ minWidth: 120 }}>Stock/Index</th>
               <th style={{ minWidth: 100 }}>Entry</th>
               {isLive ? (
                 <th style={{ minWidth: 150 }}>Target(s)</th>
@@ -48,29 +48,38 @@ const TradeTable = ({ title, data = [], isLive = false, onRowClick }) => {
                 style={{ cursor: "pointer" }}
                 onClick={() => onRowClick && onRowClick(t)} // row click handler
               >
-                <td className="text-muted">{t.date}</td>
-                <td className="fw-medium">{t.stock}</td>
-                <td className="text-truncate" style={{ maxWidth: 180 }}>
-                  {t.indexOption}
+                <td className="text-muted">
+                  {new Date(t.recommendationDateTime).toLocaleDateString()}
                 </td>
-                <td>{t.intraday}</td>
+                <td className="fw-medium">{t.segment}</td>
+                <td>{t.tradeType}</td>
                 <td>
                   <span
                     className={`badge ${
-                      t.type === "Buy" ? "bg-success" : "bg-danger"
+                      t.action === "Buy" ? "bg-success" : "bg-danger"
                     }`}
                   >
-                    {t.type}
+                    {t.action}
                   </span>
                 </td>
-                <td>{t.entry}</td>
-                <td>{isLive ? t.targets : t.exit}</td>
-                <td>{t.stoploss}</td>
-                <td>{t.duration}</td>
-                <td className="text-wrap" style={{ maxWidth: 220 }}>
-                  {t.weightage}
+                <td className="text-truncate" style={{ maxWidth: 180 }}>
+                  {t.on}
                 </td>
-                <td>{t.lotSize}</td>
+                <td>₹{t.entryPrice}</td>
+                <td>
+                  {isLive
+                    ? `₹${t.target1}, ₹${t.target2}, ₹${t.target3}`
+                    : `₹${t.exitPrice || "-"}`}
+                </td>
+                <td>₹{t.stoploss}</td>
+                <td>{t.timeDuration}</td>
+                <td className="text-wrap" style={{ maxWidth: 220 }}>
+                  {t.weightageValue}
+                  {t.weightageExtension}
+                </td>
+                <td>
+                  {t.lotSize} {t.lots > 1 ? `(${t.lots} lots)` : ""}
+                </td>
                 <td>
                   <span
                     className={`rai-dashboard-status-tag badge ${getStatusClass(
