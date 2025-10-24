@@ -1,79 +1,148 @@
-// TradeStrategy.jsx
-import React from 'react';
-import { Shield, Zap, TrendingUp, TrendingDown, Clock, Target } from 'lucide-react';
+import React from "react";
 
-// NOTE: Ensure your rai-dashboard.css includes the necessary utility classes.
 
 const TradeStrategy = () => {
-    // --- DUMMY STRATEGY DATA ---
-    const currentStrategy = {
-        title: "Tactical Caution: Range-Bound with Downside Bias",
-        comment: "The market is showing consolidation near key resistance (Nifty 25,000) coupled with high fear/greed indices. The strategy shifts from aggressive long accumulation to **tactical shorting** and **defensive profit booking**.",
-        themeColor: '#ffc107', // Warning color
-        icon: Shield,
-    };
-
-    const strategyNotes = [
-        {
-            id: 1,
-            icon: TrendingDown,
-            text: "Intraday trades should prioritize **Sell/Short** opportunities around key resistance levels (e.g., Bank Nifty 54,000).",
-            color: '#dc3545'
-        },
-        {
-            id: 2,
-            icon: Target,
-            text: "Reduce target sizes (T1/T2) on long positions. Book **partial profits** quickly as momentum is fading.",
-            color: '#198754'
-        },
-        {
-            id: 3,
-            icon: Clock,
-            text: "Avoid **overnight positions** (BTST/STBT) during expiry weeks and high-volatility sessions.",
-            color: '#007bff'
-        },
-        {
-            id: 4,
-            icon: Zap,
-            text: "Keep **Stop Losses exceptionally tight** on all new derivative positions, especially options.",
-            color: '#dc3545'
-        },
-        {
-            id: 5,
-            icon: TrendingUp,
-            text: "Long-term investors can use any **deep correction (3-5%)** to accumulate quality blue-chip stocks.",
-            color: '#198754'
-        },
+    // Dummy data (later replace with API data)
+    const comments = [
+        "Market is currently in bullish phase Volume increasing on breakout zone Stop loss to be placed near previous support.", "Wait for retest confirmation before entry  RSI showing positive divergence, monitor closely.",
     ];
 
     return (
-        <div className="rai-module-content p-3">
-            <h2 className="border-bottom pb-2 mb-4 text-primary">Current Trading Strategy</h2>
+        <div className="trade-strategy-wrapper container-fluid">
+            <style>
+                {`
+            .trade-strategy-wrapper {
+  padding: 20px;
+  background-color: #fff;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+}
 
-            {/* Strategy Card */}
-            <div className="rai-card card p-4 mb-4 shadow-sm" style={{ borderLeft: `5px solid ${currentStrategy.themeColor}` }}>
-                <div className="d-flex align-items-center mb-3">
-                    <div className="rai-icon-bg me-3" style={{ backgroundColor: `${currentStrategy.themeColor}15` }}>
-                        <currentStrategy.icon size={24} color={currentStrategy.themeColor} />
+.trade-strategy-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #222;
+}
+
+.trade-strategy-box {
+  border: 2px solid blue;
+  border-radius: 20px;
+  background: #ffffff;
+  max-width: 950px;
+}
+
+.trade-strategy-subtitle {
+  font-size: 18px;
+  font-weight: 500;
+  color: #000;
+}
+
+.trade-strategy-label {
+  font-weight: 600;
+  font-size: 15px;
+  color: #333;
+  min-width: 90px;
+}
+
+.trade-strategy-dotted {
+  border-bottom: 1px dotted #555;
+  height: 14px;
+  display: block;
+}
+
+.trade-strategy-comments {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.trade-strategy-comment-line {
+  position: relative;
+  padding-bottom: 5px;
+}
+
+.trade-strategy-comment-text {
+  display: inline-block;
+  position: relative;
+  z-index: 2;
+  background: #fff;
+  padding-right: 6px;
+  color: #444;
+  font-size: 15px;
+}
+
+.trade-strategy-dotted-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-bottom: 1px dotted #555;
+  z-index: 1;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .trade-strategy-wrapper {
+    padding: 15px;
+  }
+
+  .trade-strategy-box {
+    padding: 15px !important;
+  }
+
+  .trade-strategy-title {
+    font-size: 20px;
+  }
+
+  .trade-strategy-label {
+    font-size: 14px;
+    min-width: 70px;
+  }
+
+  .trade-strategy-comment-text {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trade-strategy-title {
+    font-size: 18px;
+  }
+
+  .trade-strategy-subtitle {
+    font-size: 16px;
+  }
+}
+
+            
+            `}
+            </style>
+            <h4 className="trade-strategy-title">Trade Strategy</h4>
+
+            <div className="trade-strategy-box p-4 mt-3">
+                <h5 className="trade-strategy-subtitle">From Trade Setup</h5>
+                <hr />
+                <div className="trade-strategy-fields mt-3">
+                    <div className="trade-strategy-line  align-items-center">
+                        <span className="trade-strategy-label">Title :</span>
+                        <span className=" "> Market Strategy</span>
                     </div>
-                    <h5 className="card-title fw-bold mb-0" style={{ color: currentStrategy.themeColor }}>
-                        {currentStrategy.title}
-                    </h5>
-                </div>
-                
-                <p className="card-text text-dark">{currentStrategy.comment}</p>
-            </div>
 
-            {/* Strategy Notes / Actionable Points */}
-            <h5 className="mb-3 text-secondary">Actionable Strategy Notes</h5>
-            <ul className="list-group rai-strategy-notes">
-                {strategyNotes.map((note) => (
-                    <li key={note.id} className="list-group-item d-flex align-items-center">
-                        <note.icon size={18} color={note.color} className="me-3 flex-shrink-0" />
-                        <span className="small text-dark">{note.text}</span>
-                    </li>
-                ))}
-            </ul>
+                    <div className="trade-strategy-line mt-3">
+                        <span className="trade-strategy-label">Comment :</span>
+                    </div>
+
+                    <div className="trade-strategy-comments mt-2">
+                        {comments.map((text, index) => (
+                            <div key={index} className="trade-strategy-comment-line">
+                                <span className="trade-strategy-comment-text">{text}</span>
+                                <span className="trade-strategy-dotted-line"></span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
