@@ -108,9 +108,11 @@ const MarketPhase = () => {
                 return (
                   <div
                     key={phase.id || idx}
-                    className="rai-card card col-12 col-md-6 col-lg-4 p-0 mb-3"
+                      className={`${
+        items.length === 1 ? "col-12" : "col-12 col-md-6 col-lg-4 "
+      } mb-3 bg-white p-3 me-3`}
                     style={{
-                      borderLeft: `4px solid ${info.color}`,
+                      borderLeft: `4px solid #1d4ed8`,
                       borderColor: "#dee2e6",
                     }}
                   >

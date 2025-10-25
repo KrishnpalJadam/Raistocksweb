@@ -20,8 +20,8 @@ const MarketInsightCard = ({ title, value, comment, date, sentiment }) => {
   const commentClass = getCommentClass(sentiment);
 
   return (
-    <div className="rai-card card">
-      <div className="card-body" style={{ padding: "12px" }}>
+    <div className="rai-card card row">
+      <div className="card-body col-sm-12" style={{ padding: "12px" }}>
         <div className="rai-flex-header">
           <div className="rai-icon-bg me-2">
             <TrendingUp size={20} color="#007bff" />
@@ -140,7 +140,10 @@ const validInsights = insights.filter(
             </h6>
             <div className="row">
               {items.map((item, index) => (
-                <div key={index} className="col-12 col-md-6 col-lg-4 mb-3">
+                <div  key={index}
+      className={`${
+        items.length === 1 ? "col-12" : "col-12 col-md-6 col-lg-4"
+      } mb-3`}>
                   <MarketInsightCard
                     title={item.title}
                     value={item.marketInfo}
