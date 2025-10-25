@@ -109,7 +109,9 @@ const MarketTrend = () => {
                 return (
                   <div
                     key={_id || idx}
-                    className="rai-card card col-12 col-md-6 col-lg-4 p-0"
+                    className={`${
+        items.length === 1 ? "col-12" : "col-12 col-md-6 col-lg-4 "
+      } mb-3 bg-white p-3 me-3`}
                     style={{
                       borderLeft: `4px solid ${trendInfo.color}`,
                     }}

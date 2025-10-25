@@ -381,7 +381,7 @@ const MarketSetup = () => {
           }}
           disabled={!currentSetup.imageUrl}
         >
-          See Image 
+          See Image
         </button>
       </div>
 

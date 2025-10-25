@@ -121,7 +121,7 @@ const TradeActions = ({ tradeId }) => {
   return (
     <div className="trade-actions mt-3">
       <h6 className="fw-bold mb-3">Trade Actions</h6>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3" >
         {tradeActions.map((action) => {
           const dateStr =
             action.createdAt || action.createdDateAt || action.createdAtDate;
@@ -132,29 +132,28 @@ const TradeActions = ({ tradeId }) => {
           return (
             <div
               key={action._id || action.id}
-              className="flex items-center justify-between p-3 bg-gray-50 rounded"
+              className="flex d-flex items-center justify-between my-3 bg-gray-50  " style={{borderBottom: "1px solid #dee2e6"}}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2" >
                 <div
-                  className={`px-4 py-2 rounded ${
-                    action.type?.toLowerCase() === "update"
+                  className={`me-3 bg-light btn btn-sm rounded ${action.type?.toLowerCase() === "update"
                       ? "bg-blue-100 text-blue-700"
                       : action.type?.toLowerCase().includes("profit")
-                      ? "bg-green-100 text-green-700"
-                      : action.type
-                      ? "bg-gray-100 text-gray-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
+                        ? "bg-green-100 text-green-700"
+                        : action.type
+                          ? "bg-gray-100 text-gray-700"
+                          : "bg-red-100 text-red-700"
+                    }`}
                 >
                   {action.type ? action.type : "Unknown"}
                 </div>
               </div>
-              <div className="flex flex-col items-end">
-                <div className="text-sm font-medium">
+              <div className="d-flex flex-col items-end">
+                <div className="text-sm font-medium me-3">
                   ₹{action.price ?? "-"}
                 </div>
-                <div className="text-xs text-gray-500">{displayDate}</div>
-                {action.title && <div className="text-sm">{action.title}</div>}
+                <div className="text-xs text-gray-500 me-3">{displayDate}</div>
+                {action.title && <div className="text-sm ">{action.title}</div>}
                 {action.comment && (
                   <div className="text-xs text-gray-600">{action.comment}</div>
                 )}
@@ -178,9 +177,8 @@ const TradeUpdatePill = ({ update }) => (
         ₹{update.price}
         {update.text && update.live ? (
           <span
-            className={`update-percentage ${
-              update.text.startsWith("+") ? "profit-text" : "loss-text"
-            }`}
+            className={`update-percentage ${update.text.startsWith("+") ? "profit-text" : "loss-text"
+              }`}
           >
             {" "}
             {update.text}
@@ -353,9 +351,8 @@ const TradeRecommendation = () => {
 
               {trade.status === "Closed" && (
                 <div
-                  className={`pnl-summary ${
-                    trade.result === "Profit" ? "profit" : "loss"
-                  }`}
+                  className={`pnl-summary ${trade.result === "Profit" ? "profit" : "loss"
+                    }`}
                 >
                   {trade.result === "Profit" ? "▲" : "▼"} ₹
                   {Math.abs(trade.pnl || 0).toLocaleString()}
