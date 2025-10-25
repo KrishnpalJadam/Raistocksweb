@@ -1524,3 +1524,45 @@ a {
     font-size: 9px;
   }
 }
+
+
+
+
+.my-newtradesetup-container {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+
+.my-newtradesetup-card {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.my-newtradesetup-list {
+  list-style: disc;
+  padding-left: 20px;
+  margin-bottom: 0;
+}
+
+.my-newtradesetup-gauge {
+  width: 200px;
+  height: 100px;
+  border-radius: 100px 100px 0 0;
+  background: linear-gradient(to right, #eee 50%, #ccc 50%);
+  border: 5px solid #ddd;
+  position: relative;
+}
+
+.my-newtradesetup-gauge::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-60deg);
+  width: 4px;
+  height: 60px;
+  background: #000;
+  transform-origin: bottom;
+  border-radius: 2px;
+}

@@ -7,6 +7,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTrades } from "../slices/tradeSlice";
 import { fetchTradeSetup } from "../slices/tradeSetupSlice";
+import MarketTrend from "./MarketTrend";
+import TradeSetup from "./TradeSetup";
 
 /* Module Panel: fly-out from right covering main content */
 const ModulePanel = ({ moduleName, onClose }) => {
@@ -283,7 +285,7 @@ const Dashboard = ({ activeModule, setActiveModule }) => {
             </div>
           </div>
 
-          <h5 className="mt-4 mb-3">Trade Setup Insight (Posts)</h5>
+          {/* <h5 className="mt-4 mb-3">Trade Setup Insight (Posts)</h5>
           <div className="row">
             {setupsLoading ? (
               <div className="text-center p-4">Loading trade setups...</div>
@@ -306,10 +308,10 @@ const Dashboard = ({ activeModule, setActiveModule }) => {
                 </div>
               ))
             )}
-          </div>
+          </div> */}
         </>
       )}
-
+<TradeSetup/>
       {showPanel && (
         <ModulePanel
           moduleName={activeModule}
