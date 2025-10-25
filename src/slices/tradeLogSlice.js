@@ -22,36 +22,49 @@ export const fetchTradeDiaryEntries = createAsyncThunk(
       console.log("Fetched diary logs from backend:", data);
       return data;
     } catch (err) {
-      console.error("Fetch Trade Logs Error:", err.response?.data || err.message);
+      console.error(
+        "Fetch Trade Logs Error:",
+        err.response?.data || err.message
+      );
       return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
-
 
 // ✅ 2. Add new trade diary entry
 export const addTradeDiaryEntry = createAsyncThunk(
   "tradeLogs/add",
   async (entryData, { getState, rejectWithValue }) => {
     try {
-const userId = getState().clientAuth.client?._id || getState().clientAuth.client?.id;
+      const state = getState();
+      const client =
+        state.clientAuth?.client ||
+        state.client ||
+        state.auth?.client ||
+        state.auth?.user ||
+        null;
+
+      const userId = client?._id || client?.id;
       if (!userId) throw new Error("User not logged in");
 
-      // ✅ Must send crmUser (not user_id)
-      const dataToSend = {
-        ...entryData,
-        crmUser: userId,
-      };
-
-      console.log("Sending new trade log to backend:", dataToSend);
+      const dataToSend = { ...entryData, crmUser: userId };
 
       const response = await axios.post(API_URL, dataToSend);
-      const newLog = response.data?.data || response.data;
+      console.log("API Response:", response.data); // Debug log
 
-      console.log("New log saved on backend:", newLog);
+      const resData = response.data;
+      const newLog =
+        resData?.data?.trade ||
+        resData?.data ||
+        (Array.isArray(resData) ? resData[0] : resData) ||
+        null;
+
+      console.log("Processed new log:", newLog); // Debug log
+
+      if (!newLog)
+        throw new Error("Invalid server response: no trade log returned");
       return newLog;
     } catch (error) {
-      console.error("Backend Error (Add Log):", error.response?.data || error.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -62,7 +75,18 @@ export const updateTradeDiaryEntry = createAsyncThunk(
   "tradeLogs/update",
   async ({ id, data }, { getState, rejectWithValue }) => {
     try {
-const userId = getState().clientAuth.client?._id || getState().clientAuth.client?.id;
+      // ✅ Same fix here
+      const clientState = getState().clientAuth;
+      const state = getState();
+      const client =
+        state.clientAuth?.client ||
+        state.client ||
+        state.auth?.client ||
+        state.auth?.user ||
+        null;
+
+      const userId = client?._id || client?.id;
+      if (!userId) throw new Error("User not logged in");
       if (!userId) throw new Error("User not logged in");
 
       const updatedData = { ...data, crmUser: userId };
@@ -133,7 +157,9 @@ const tradeLogSlice = createSlice({
 
       // UPDATE
       .addCase(updateTradeDiaryEntry.fulfilled, (state, action) => {
-        const idx = state.logs.findIndex((log) => log._id === action.payload._id);
+        const idx = state.logs.findIndex(
+          (log) => log._id === action.payload._id
+        );
         if (idx !== -1) state.logs[idx] = action.payload;
       })
 

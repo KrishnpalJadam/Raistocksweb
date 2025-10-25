@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import {
-  X,
-  ClipboardCheck,
-  TrendingUp,
-} from "lucide-react";
+import { X, ClipboardCheck, TrendingUp } from "lucide-react";
 import { fetchTrades } from "../slices/tradeSlice";
-import { fetchTradeActions } from "../slices/tradeActionsSlice";
+import {
+  fetchTradeActions,
+  fetchAllTradeActions,
+} from "../slices/tradeActionsSlice";
 import {
   setTradeFormField,
   setSelectedTrade,
@@ -18,6 +17,7 @@ import {
   addTradeDiaryEntry,
   fetchTradeDiaryEntries,
 } from "../slices/tradeLogSlice";
+import { toast } from "react-toastify"; // ✅ use existing toast setup
 
 const TradeDiary = () => {
   const dispatch = useDispatch();
@@ -31,50 +31,65 @@ const TradeDiary = () => {
 
   const [tradesWithExit, setTradesWithExit] = useState([]);
 
-  // ✅ Fetch trades + actions + logs
+  // ✅ Fetch trades, trade actions, and diary entries when client logs in
   useEffect(() => {
-    if (user?._id || user?.id) {
-      dispatch(fetchTrades());
-      dispatch(fetchTradeActions()); // fetch ALL actions once
-      dispatch(fetchTradeDiaryEntries(user._id || user.id));
-    }
+    const userId = user?._id || user?.id;
+    if (!userId) return;
+
+    const loadData = async () => {
+      try {
+        const tradesRes = await dispatch(fetchTrades()).unwrap();
+        const actionsRes = await dispatch(fetchAllTradeActions()).unwrap();
+
+        // Fallback: fetch per trade if global action fetch fails
+        if (!actionsRes || !actionsRes.length) {
+          for (const t of tradesRes) {
+            await dispatch(fetchTradeActions(t._id || t.id));
+          }
+        }
+
+        await dispatch(fetchTradeDiaryEntries(userId));
+      } catch (err) {
+        console.error("Failed to fetch trade data:", err);
+      }
+    };
+
+    loadData();
   }, [dispatch, user?._id, user?.id]);
 
-  // Filter trades that have an exit action
+  // ✅ Compute trades with exit actions
   useEffect(() => {
-    if (!trades.length || !tradeActions.length) return;
+    if (!Array.isArray(trades) || !Array.isArray(tradeActions)) return;
 
     const exitTrades = trades.filter((trade) => {
       const tradeId = trade._id || trade.id;
       const relatedActions = tradeActions.filter(
         (a) =>
-          a.tradeId === tradeId ||
-          a.trade_id === tradeId ||
-          a.related_trade === tradeId
+          String(a.tradeId || a.trade_id || a.related_trade) === String(tradeId)
       );
-      // Only look for exit actions
-      return relatedActions.some((a) => {
-        const t = (a.type || "").toLowerCase();
-        return t.includes("exit");
-      });
+
+      return relatedActions.some((a) =>
+        (a.type || "").toLowerCase().includes("exit")
+      );
     });
 
     setTradesWithExit(exitTrades);
   }, [trades, tradeActions]);
 
+  // ✅ Auto-select first trade if none selected
   const selectedTrade =
     tradeForm.selectedTrade ||
     (tradesWithExit.length ? tradesWithExit[0] : null);
-
-  const yourEntry = tradeForm.yourEntry ?? "";
-  const yourExit = tradeForm.yourExit ?? "";
-  const quantity = tradeForm.quantity ?? "";
 
   useEffect(() => {
     if (!selectedTrade && tradesWithExit.length) {
       dispatch(setSelectedTrade(tradesWithExit[0]));
     }
   }, [selectedTrade, tradesWithExit, dispatch]);
+
+  const yourEntry = tradeForm.yourEntry ?? "";
+  const yourExit = tradeForm.yourExit ?? "";
+  const quantity = tradeForm.quantity ?? "";
 
   const getExitActionForTrade = (tradeId) => {
     return tradeActions.find((a) => {
@@ -83,29 +98,35 @@ const TradeDiary = () => {
         a.trade_id === tradeId ||
         a.related_trade === tradeId;
       if (!matches) return false;
-      const type = (a.type || "").toLowerCase();
-      // Focus on exit actions only
-      return type.includes("exit");
+      return (a.type || "").toLowerCase().includes("exit");
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Form submitted with values:", {
+      selectedTrade,
+      yourEntry,
+      yourExit,
+      quantity,
+    });
+
     if (!selectedTrade || !yourEntry || !yourExit || !quantity) {
-      alert("Please fill all fields.");
+      toast.warn("⚠️ Please fill all fields.");
       return;
     }
 
     if (authLoading) {
-      alert("Authentication in progress. Please wait...");
+      toast.info("Authenticating... please wait.");
       return;
     }
 
     const userId = user?._id || user?.id;
     if (!userId) {
-      alert("Please log in to save your trade.");
+      toast.error("Please log in to save your trade.");
       return;
     }
+    console.log("User ID:", userId);
 
     const entry = parseFloat(yourEntry);
     const exit = parseFloat(yourExit);
@@ -113,7 +134,9 @@ const TradeDiary = () => {
     const pnl = parseFloat(((exit - entry) * qty).toFixed(2));
     const result = pnl >= 0 ? "Profit" : "Loss";
 
-    const exitAction = getExitActionForTrade(selectedTrade._id || selectedTrade.id);
+    const exitAction = getExitActionForTrade(
+      selectedTrade._id || selectedTrade.id
+    );
     const recommendedExit =
       exitAction?.price ||
       exitAction?.exit_price ||
@@ -123,10 +146,7 @@ const TradeDiary = () => {
     const newLog = {
       trade_id: selectedTrade._id || selectedTrade.id,
       tradeTitle: selectedTrade.title || selectedTrade.trade_title,
-      action:
-        selectedTrade.trade_action ||
-        selectedTrade.action ||
-        "N/A",
+      action: selectedTrade.trade_action || selectedTrade.action || "N/A",
       recommendedEntry:
         selectedTrade.entry_price ||
         selectedTrade.entry ||
@@ -141,7 +161,8 @@ const TradeDiary = () => {
     };
 
     try {
-      await dispatch(
+      console.log("Sending trade log data:", newLog);
+      const savedEntry = await dispatch(
         addTradeDiaryEntry({
           user_id: userId,
           trade_id: newLog.trade_id,
@@ -156,14 +177,17 @@ const TradeDiary = () => {
           action: newLog.action,
           date: newLog.date,
         })
-      );
+      ).unwrap();
+
+      console.log("Saved entry:", savedEntry);
+      console.log("Trade log saved successfully:", result);
 
       dispatch(addTradeLog(newLog));
       dispatch(resetTradeForm());
-      alert("Trade logged successfully!");
+      toast.success("✅ Trade logged successfully!");
     } catch (err) {
       console.error("Failed to log trade:", err);
-      alert("Failed to log trade: " + (err.message || "Unknown error"));
+      toast.error("Failed to log trade: " + (err.message || "Unknown error"));
     }
   };
 
@@ -177,6 +201,7 @@ const TradeDiary = () => {
 
   return (
     <div className="rai-module-content p-3">
+      {/* === Heading === */}
       <div className="d-flex justify-content-between mb-4">
         <h4 style={{ fontWeight: 600 }}>Trade Diary & P&L Log</h4>
         <Link
@@ -188,6 +213,7 @@ const TradeDiary = () => {
         </Link>
       </div>
 
+      {/* === Form + Summary === */}
       <div className="row">
         {/* --- Trade Form --- */}
         <div className="col-lg-5 mb-4">
@@ -357,31 +383,36 @@ const TradeDiary = () => {
             </tr>
           </thead>
           <tbody>
-            {diaryLogs.map((entry, i) => (
-              <tr key={entry._id || entry.id || i}>
-                <td>{new Date(entry.date).toLocaleDateString()}</td>
-                <td>{entry.tradeTitle}</td>
-                <td>{entry.action}</td>
-                <td>{entry.recommendedEntry ?? "-"}</td>
-                <td>{entry.entry ?? "-"}</td>
-                <td>{entry.recommendedExit ?? "-"}</td>
-                <td>{entry.exit ?? "-"}</td>
-                <td>{entry.quantity}</td>
-                <td
-                  className={`fw-bold ${
-                    entry.result === "Profit"
-                      ? "text-success"
-                      : "text-danger"
-                  }`}
-                >
-                  {entry.pnl.toLocaleString("en-IN", {
-                    style: "currency",
-                    currency: "INR",
-                  })}
-                </td>
-                <td>{entry.result}</td>
-              </tr>
-            ))}
+            {diaryLogs.map((entry, i) => {
+              console.log("Rendering trade log entry:", entry); // Debug log
+              return (
+                <tr key={entry._id || entry.id || i}>
+                  <td>{new Date(entry.date).toLocaleDateString()}</td>
+                  <td>{entry.trade_title || entry.tradeTitle}</td>
+                  <td>{entry.action}</td>
+                  <td>
+                    {entry.recommended_entry || entry.recommendedEntry || "-"}
+                  </td>
+                  <td>{entry.entry || "-"}</td>
+                  <td>
+                    {entry.recommended_exit || entry.recommendedExit || "-"}
+                  </td>
+                  <td>{entry.exit || "-"}</td>
+                  <td>{entry.quantity}</td>
+                  <td
+                    className={`fw-bold ${
+                      entry.result === "Profit" ? "text-success" : "text-danger"
+                    }`}
+                  >
+                    {(Number(entry.pnl) || 0).toLocaleString("en-IN", {
+                      style: "currency",
+                      currency: "INR",
+                    })}
+                  </td>
+                  <td>{entry.result}</td>
+                </tr>
+              );
+            })}
           </tbody>
           <tfoot className="table-light">
             <tr>
@@ -389,10 +420,7 @@ const TradeDiary = () => {
                 Total:
               </td>
               <td className="fw-bold">
-                {diaryLogs.reduce(
-                  (s, l) => s + (Number(l.quantity) || 0),
-                  0
-                )}
+                {diaryLogs.reduce((s, l) => s + (Number(l.quantity) || 0), 0)}
               </td>
               <td
                 className={`fw-bold ${
