@@ -1,12 +1,5 @@
 // MarketSetup.jsx
-import {
-  Target,
-  Scale,
-  TrendingUp,
-  TrendingDown,
-  BookOpen,
-  X,
-} from "lucide-react";
+import { Target, Scale, TrendingUp, TrendingDown, BookOpen, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -43,13 +36,43 @@ const MarketSetup = () => {
     imageUrl: "",
   };
 
-  // Log the setup data for debugging
-  useEffect(() => {
-    console.log("Current setup updated:", currentSetup);
-    if (currentSetup.breakoutEvents) {
-      console.log("Breakout events:", currentSetup.breakoutEvents);
-    }
-  }, [currentSetup]);
+    const data = [25, 25, 25, 25]; // 4 segments 25% each
+    const config = {
+      type: "gauge",
+      data: {
+        datasets: [
+          {
+            value: 44.44, // needle position
+            minValue: 0,
+            data: [100], // total gauge span
+            valueColorStops: [
+              [0.0, "#8B0000"],  // Fear
+              [0.25, "#FF6347"], // Accumulation
+              [0.5, "#90EE90"],  // Distribution
+              [0.75, "#006400"], // Greed
+              [1.0, "#006400"]
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        layout: { padding: { bottom: 20 } },
+        needle: {
+          radiusPercentage: 2,
+          widthPercentage: 3.2,
+          lengthPercentage: 80,
+          color: "#000",
+        },
+        valueLabel: { display: false },
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: "Market Phase Meter" },
+        },
+      },
+    };
+
 
   useEffect(() => {
     // Fetch market setups when component mounts
@@ -70,16 +93,9 @@ const MarketSetup = () => {
     }
   }, [setups]);
 
-  // Chart effect
-  useEffect(() => {
-    if (!chartRef.current || !marketSetup) return;
+    const ctx = chartRef.current.getContext('2d');
+    window.myGauge = new Chart(ctx, config);
 
-    const phaseMap = {
-      Fear: 0.25, // 25% of the gauge
-      Accumulation: 0.5, // 50%
-      Distribution: 0.75, // 75%
-      Greed: 1.0, // 100%
-    };
 
     const colorMap = {
       Fear: "#8B0000",
@@ -87,63 +103,47 @@ const MarketSetup = () => {
       Distribution: "#90EE90",
       Greed: "#006400",
     };
+  }, []);
+  const [activeStep, setActiveStep] = useState(1);
 
-    const needleValue = phaseMap[marketSetup.phase] || 0;
-    const currentPhaseColor = colorMap[marketSetup.phase] || "#000";
-
-    const data = {
-      datasets: [
-        {
-          value: needleValue, // position of needle
-          minValue: 0,
-          data: [1], // total gauge value
-          valueColorStops: [
-            [0, "#8B0000"], // Fear zone
-            [0.25, "#FF6347"], // Accumulation zone
-            [0.5, "#90EE90"], // Distribution zone
-            [0.75, "#006400"], // Greed zone
-            [needleValue, currentPhaseColor], // Current phase color stops at needle
-            [needleValue + 0.001, "#e0e0e0"], // Grey color after needle
-            [1, "#e0e0e0"], // rest of gauge stays grey
-          ],
-          borderWidth: 1,
-          needleColor: "#000", // needle color stays black
-        },
+  const steps = [
+    { id: 1, label: "STEP 1", color: "bg-orange-400" },
+    { id: 2, label: "STEP 2", color: "bg-orange-500" },
+    { id: 3, label: "STEP 3", color: "bg-red-500" },
+    { id: 4, label: "STEP 4", color: "bg-pink-500" },
+    { id: 5, label: "STEP 5", color: "bg-purple-500" },
+  ];
+  // --- DUMMY MARKET SETUP DATA ---
+  const dummySetupData = {
+    keyLevels: {
+      support: [
+        { level: "24,500", comment: "Major support zone, breakdown could trigger correction." },
+        { level: "24,300", comment: "Short-term crucial support; bias turns weak below this." },
+        { level: "23,800", comment: "Strong cushion for the medium-term trend." },
       ],
-    };
-
-    const config = {
-      type: "gauge",
-      data: data,
-      options: {
-        responsive: true,
-        layout: { padding: { bottom: 20 } },
-        needle: {
-          radiusPercentage: 2,
-          widthPercentage: 3.2,
-          lengthPercentage: 80,
-          color: "#000", // keep needle black
-        },
-        valueLabel: { display: false },
-        plugins: {
-          legend: { display: false },
-          title: { display: true, text: "Market Phase Meter" },
-        },
+      resistance: [
+        { level: "25,000", comment: "Immediate hurdle; sustained closing above this is bullish." },
+        { level: "25,200", comment: "Ultimate barrier; new uptrend starts upon breach." },
+        { level: "25,350", comment: "Upper band of channel." },
+      ],
+    },
+    patterns: [
+      {
+        title: "Chart Pattern",
+        icon: Scale,
+        name: "Ascending Triangle",
+        status: "Active (Breakout pending)",
+        comment: "Developing on the Daily chart, indicating potential upward breakout.",
       },
-    };
+      {
+        title: "Candle Pattern",
+        icon: BookOpen,
+        name: "Doji (Weekly)",
+        status: "Confirmed (Indecision)",
+        comment: "Shows market indecision at high levels — caution advised.",
+      },
+    ],
 
-    const ctx = chartRef.current.getContext("2d");
-    window.myGauge && window.myGauge.destroy();
-    window.myGauge = new Chart(ctx, config);
-  }, [marketSetup]);
-
-  // Define colors for up to 5 steps/events
-  const eventColors = {
-    step1: "bg-orange-400",
-    step2: "bg-orange-500",
-    step3: "bg-red-500",
-    step4: "bg-pink-500",
-    step5: "bg-purple-500",
   };
 
   const SetupCard = ({ title, icon: Icon, name, status, price, comment }) => (
@@ -156,9 +156,7 @@ const MarketSetup = () => {
           <h6 className="mb-0 text-primary fw-semibold">{title}</h6>
         </div>
         <h5 className="fw-bold mb-1">{name}</h5>
-        {price && (
-          <p className="text-muted small mb-1">Price Action: {price}</p>
-        )}
+        {price && <p className="text-muted small mb-1">Price Action: {price}</p>}
 
         <p className="small text-secondary mb-0">{comment}</p>
       </div>
@@ -257,25 +255,39 @@ const MarketSetup = () => {
 
       {/* --- Support & Resistance --- */}
       <div className="card border-primary mb-4">
+
+
         <div className="row mb-4">
-          {/* Support Levels */}
+
+
           <div className="col-6 mb-3">
             <div className="card border-success shadow-sm h-100">
               <div className="card-header bg-success text-white fw-bold d-flex align-items-center">
                 <Target size={18} className="me-2" /> Key Support Levels
               </div>
               <ul className="list-group list-group-flush">
-                {currentSetup.supportLevels &&
-                  currentSetup.supportLevels.map((level, i) => (
-                    <li key={`S-${i}`} className="list-group-item small">
-                      <span className="fw-semibold text-primary me-2">
-                        {level.toLocaleString()}
-                      </span>
-                    </li>
-                  ))}
+                {dummySetupData.keyLevels.support.map((item, i) => (
+                  <li key={`S-${i}`} className="list-group-item small">
+                    <span className="fw-semibold text-primary me-2">{item.level}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
+          <div className="col-6 mb-3">
+            <div className="card border-danger shadow-sm h-100">
+              <div className="card-header bg-danger text-white fw-bold d-flex align-items-center">
+                <Target size={18} className="me-2" /> Key Resistance Levels
+              </div>
+              <ul className="list-group list-group-flush">
+                {dummySetupData.keyLevels.resistance.map((item, i) => (
+                  <li key={`R-${i}`} className="list-group-item small">
+                    <span className="fw-semibold text-primary me-2">{item.level}</span>
+                  </li>
+                ))}
+              </ul>
+
+            </div>
 
           {/* Resistance Levels */}
           <div className="col-6 mb-3">
@@ -295,94 +307,48 @@ const MarketSetup = () => {
               </ul>
             </div>
           </div>
-
-          {/* Support/Resistance Comment */}
           <div className="p-3">
-            <div
-              className="bg-light p-3"
-              style={{ width: "100%", height: "100px" }}
-            >
-              {currentSetup.supportResistanceComment || "No comment available"}
+
+
+            <div className="bg-light p-3" style={{ width: "100%", height: "100px" }}>
+              Comment here
             </div>
           </div>
         </div>
       </div>
       {/* --- Patterns & Events --- */}
       <div className="row">
-        {/* Chart Pattern Card */}
-        <div className="col-12 col-md-6 col-lg-6">
-          <SetupCard
-            title="Chart Pattern"
-            icon={Scale}
-            name={currentSetup.chartPattern || "No pattern detected"}
-            status="Active"
-            comment={currentSetup.chartPatternComment || "No comment available"}
-          />
-        </div>
-        {/* Candle Pattern Card */}
-        <div className="col-12 col-md-6 col-lg-6">
-          <SetupCard
-            title="Candle Pattern"
-            icon={BookOpen}
-            name={currentSetup.candlePattern || "No pattern detected"}
-            status="Active"
-            comment={
-              currentSetup.candlePatternComment || "No comment available"
-            }
-          />
+        {dummySetupData.patterns.map((item, i) => (
+          <div className="col-12 col-md-6 col-lg-6" key={i}>
+            <SetupCard {...item} />
+          </div>
         </div>
       </div>
       <div className="bg-white card border-primary mt-4">
         <div className="">
           <div className="steps p-3">
-            {console.log("Current setup:", currentSetup)}
-            {console.log("Breakout events:", currentSetup.breakoutEvents)}
-            {currentSetup.breakoutEvents &&
-              currentSetup.breakoutEvents.map((event, index) => {
-                if (index < 5) {
-                  // Limit to 5 events
-                  return (
-                    <div
-                      key={index}
-                      className={`step step${index + 1}`}
-                      onClick={() => setActiveStep(index + 1)}
-                    >
-                      {event.formation || "N/A"}
-                    </div>
-                  );
-                }
-                return null;
-              })}
+            <div className="step step1">Formation</div>
+            <div className="step step2">Breakout</div>
+            <div className="step step3">Retest</div>
+
           </div>
           <div className="p-3">
-            <div
-              className="bg-light p-3"
-              style={{ width: "100%", height: "100px" }}
-            >
-              {(currentSetup.breakoutEvents &&
-                currentSetup.breakoutEvents[activeStep - 1]?.eventComment) ||
-                "Select an event to view comment"}
+
+
+            <div className="bg-light p-3" style={{ width: "100%", height: "100px" }}>
+              Comment here
             </div>
           </div>
         </div>
       </div>
 
+
       {/* Image Button and Popup */}
       <div>
-        <button
-          className="btn btn-primary mt-3"
-          onClick={() => {
-            console.log("Image URL:", currentSetup.imageUrl);
-            console.log(
-              "Full Image URL:",
-              `http://localhost:5000${currentSetup.imageUrl}`
-            );
-            setShowImagePopup(true);
-          }}
-          disabled={!currentSetup.imageUrl}
-        >
-          See Image 
+        <button className="btn btn-primary mt-3">
+          See Image
         </button>
+
       </div>
 
       {/* Image Popup */}
